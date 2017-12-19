@@ -25,7 +25,7 @@
 
 namespace Synerga;
 
-class Menu
+class Link
 {
 	/** @var Data */
 	private $data;
@@ -39,40 +39,17 @@ class Menu
 		$this->url = $url;
 	}
 
-	public function getHtml($menuPath)
+	public function getHtml($textHtml, $linkPath)
 	{
-		$menu = $this->getMenu($menuPath);
-		$urlPath = $this->url->getPath();
+		$attributes = array();
 
-		$ulInnerHtml = '';
+		$pagePath = $this->url->getPath();
 
-		foreach ($menu as $itemPath => $itemName) {
-			$liAttributes = array();
-			$aAttributes = array();
-
-			if ($urlPath === $itemPath) {
-				$liAttributes['class'] = 'here';
-			} else {
-				$aAttributes['href'] = $this->url->getUrl($itemPath);
-			}
-
-			$textHtml = Html5::getTextHtml($itemName);
-			$aHtml = Html5::getElementHtml('a', $aAttributes, $textHtml);
-			$ulInnerHtml .= Html5::getElementHtml('li', $liAttributes, $aHtml);
+		if ($linkPath !== $pagePath) {
+			$url = $this->url->getUrl($linkPath);
+			$attributes['href'] = $url;
 		}
 
-		return Html5::getElementHtml('ul', array(), $ulInnerHtml);
-	}
-
-	private function getMenu($path)
-	{
-		$contents = $this->data->read($path);
-		$menu = json_decode($contents, true);
-
-		if (!is_array($menu)) {
-			return array();
-		}
-
-		return $menu;
+		return Html5::getElementHtml('a', $attributes, $textHtml);
 	}
 }

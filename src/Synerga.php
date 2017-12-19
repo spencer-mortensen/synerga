@@ -34,13 +34,9 @@ class Synerga
 	private function command($name, array $arguments = array())
 	{
 		switch ($name) {
-			case 'router':
-				$router = $this->get('router');
-				return $router->run();
-
-			case 'path':
-				$url = $this->get('url');
-				return $url->getPath();
+			case 'link':
+				$link = $this->get('link');
+				return $link->getHtml($arguments[0], $arguments[1]);
 
 			case 'include':
 				$data = $this->get('data');
@@ -48,10 +44,13 @@ class Synerga
 				$contents = $data->read($arguments[0]);
 				return $synerga->run($contents);
 
-			case 'menu':
-				$menu = $this->get('menu');
-				$items = $arguments[0];
-				return $menu->getHtml($items);
+			case 'path':
+				$url = $this->get('url');
+				return $url->getPath();
+
+			case 'router':
+				$router = $this->get('router');
+				return $router->run();
 
 			default:
 				return null;
@@ -65,8 +64,15 @@ class Synerga
 			case 'data':
 				return new Data($GLOBALS['data']);
 
-			case 'url':
-				return new Url($_SERVER['SYNERGA_BASE'], $_SERVER['SYNERGA_PATH']);
+			case 'link':
+				$data = $this->get('data');
+				$url = $this->get('url');
+				return new Link($data, $url);
+
+			case 'file':
+				$data = $this->get('data');
+				$mime = $this->get('mime');
+				return new File($data, $mime);
 
 			case 'mime':
 				$data = $this->get('data');
@@ -77,11 +83,6 @@ class Synerga
 				$data = $this->get('data');
 				return new Page($synerga, $data);
 
-			case 'file':
-				$data = $this->get('data');
-				$mime = $this->get('mime');
-				return new File($data, $mime);
-
 			case 'router':
 				$data = $this->get('data');
 				$url = $this->get('url');
@@ -89,10 +90,8 @@ class Synerga
 				$file = $this->get('file');
 				return new Router($data, $url, $page, $file);
 
-			case 'menu':
-				$data = $this->get('data');
-				$url = $this->get('url');
-				return new Menu($data, $url);
+			case 'url':
+				return new Url($_SERVER['SYNERGA_BASE'], $_SERVER['SYNERGA_PATH']);
 		}
 	}
 
