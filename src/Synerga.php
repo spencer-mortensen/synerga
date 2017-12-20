@@ -40,7 +40,7 @@ class Synerga
 
 			case 'include':
 				$data = $this->get('data');
-				$synerga = $this->get('synerga');
+				$synerga = $this->get('synerga'); /** @var Synerga $synerga */
 				$contents = $data->read($arguments[0]);
 				return $synerga->run($contents);
 
@@ -65,9 +65,8 @@ class Synerga
 				return new Data($GLOBALS['data']);
 
 			case 'link':
-				$data = $this->get('data');
 				$url = $this->get('url');
-				return new Link($data, $url);
+				return new Link($url);
 
 			case 'file':
 				$data = $this->get('data');
@@ -92,6 +91,9 @@ class Synerga
 
 			case 'url':
 				return new Url($_SERVER['SYNERGA_BASE'], $_SERVER['SYNERGA_PATH']);
+
+			default:
+				return null;
 		}
 	}
 
@@ -125,33 +127,6 @@ class Synerga
 		$output .= $parser->getText();
 
 		return $output;
-	}
-
-	private static function getCommand($input, &$name, &$arguments)
-	{
-		$input = trim($input);
-
-		if (strlen($input) === 0) {
-			return false;
-		}
-
-		$commandParts = explode(' ', $input, 2);
-
-		$name = $commandParts[0];
-		$arguments = self::getCommandArguments($commandParts[1]);
-
-		return true;
-	}
-
-	private static function getCommandArguments(&$input)
-	{
-		if (!is_string($input)) {
-			return array();
-		}
-
-		return array(
-			json_decode($input, true)
-		);
 	}
 
 	private function get($name)

@@ -98,9 +98,4 @@ class Parser
 
 		return true;
 	}
-
-	private function isInputConsumed()
-	{
-		return strlen($this->input) === 0;
-	}
 }

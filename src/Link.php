@@ -27,15 +27,11 @@ namespace Synerga;
 
 class Link
 {
-	/** @var Data */
-	private $data;
-
 	/** @var Url */
 	private $url;
 
-	public function __construct(Data $data, Url $url)
+	public function __construct(Url $url)
 	{
-		$this->data = $data;
 		$this->url = $url;
 	}
 
