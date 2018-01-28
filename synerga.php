@@ -2,6 +2,8 @@
 
 namespace Synerga;
 
+require __DIR__ . '/autoload.php';
+
 call_user_func(function () {
 	$projectDirectory = __DIR__;
 	$vendorDirectory = "{$projectDirectory}/vendor";
