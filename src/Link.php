@@ -25,6 +25,8 @@
 
 namespace Synerga;
 
+use SpencerMortensen\Html5\Html5;
+
 class Link
 {
 	/** @var Url */

@@ -39,6 +39,11 @@ class Url
 		$this->path = $path;
 	}
 
+	public function getBase()
+	{
+		return $this->base;
+	}
+
 	public function getPath()
 	{
 		return $this->path;

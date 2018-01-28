@@ -10,7 +10,7 @@
         "cms"
     ],
     "homepage": "https://github.com/spencer-mortensen/synerga",
-    "license": "LGPL-3.0",
+    "license": "LGPL-3.0-or-later",
     "authors": [
         {
             "name": "Spencer Mortensen",
@@ -20,7 +20,8 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0"
+        "php": ">=5.4.0",
+        "spencer-mortensen/html5": "^1.0"
     },
     "autoload": {
         "psr-4": {
