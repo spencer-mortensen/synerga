@@ -25,83 +25,48 @@
 
 namespace Synerga;
 
-class Synerga
+use Synerga\Commands\Command;
+use SpencerMortensen\Parser\String\Parser;
+use SpencerMortensen\Parser\String\Rules;
+
+class Synerga extends Parser
 {
-	/** @var array */
-	private $services;
+	/** @var Objects */
+	private $objects;
 
-	// TODO: move this to the user configuration:
-	private function command($name, array $arguments = array())
-	{
-		switch ($name) {
-			case 'link':
-				$link = $this->get('link');
-				return $link->getHtml($arguments[0], $arguments[1]);
-
-			case 'include':
-				$data = $this->get('data');
-				$synerga = $this->get('synerga'); /** @var Synerga $synerga */
-				$contents = $data->read($arguments[0]);
-				return $synerga->run($contents);
-
-			case 'path':
-				$url = $this->get('url');
-				return $url->getPath();
-
-			case 'router':
-				$router = $this->get('router');
-				return $router->run();
-
-			default:
-				return null;
-		}
-	}
-
-	// TODO: move this to user configuration:
-	private function service($name)
-	{
-		switch ($name) {
-			case 'data':
-				return new Data($GLOBALS['data']);
-
-			case 'link':
-				$url = $this->get('url');
-				return new Link($url);
-
-			case 'file':
-				$data = $this->get('data');
-				$mime = $this->get('mime');
-				return new File($data, $mime);
-
-			case 'mime':
-				$data = $this->get('data');
-				return new Mime($data);
-
-			case 'page':
-				$synerga = $this->get('synerga');
-				$data = $this->get('data');
-				return new Page($synerga, $data);
-
-			case 'router':
-				$data = $this->get('data');
-				$url = $this->get('url');
-				$page = $this->get('page');
-				$file = $this->get('file');
-				return new Router($data, $url, $page, $file);
-
-			case 'url':
-				return new Url($_SERVER['SYNERGA_BASE'], $_SERVER['SYNERGA_PATH']);
-
-			default:
-				return null;
-		}
-	}
+	/** @var string */
+	private $input;
 
 	public function __construct()
 	{
-		$this->services = array(
-			'synerga' => $this
-		);
+		$this->objects = new Objects();
+		$this->objects->set('synerga', $this);
+
+		$grammar = <<<'EOS'
+expression: AND commands text
+commands: MANY commandSegment 0
+commandSegment: AND text command
+text: RE .*?(?=<:|$)
+command: AND commandBegin identifier arguments optionalSpace commandEnd
+commandBegin: STRING <:
+identifier: RE [a-zA-Z_0-9]+
+arguments: MANY argumentSegment 0
+argumentSegment: AND space argument
+space: RE \s+
+argument: OR value command
+value: OR null boolean number string
+null: STRING null
+boolean: RE (?:false|true)
+number: RE -?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?
+string: RE "(?:[^\x00-\x1f"\\]|\\(?:["\\/bfnrt]|u[0-9a-f]{4}))*"
+optionalSpace: RE \s*
+commandEnd: STRING :>
+EOS;
+
+		$rules = new Rules($this, $grammar);
+		$rule = $rules->getRule('expression');
+
+		parent::__construct($rule);
 	}
 
 	public function run($input)
@@ -110,33 +75,77 @@ class Synerga
 			return null;
 		}
 
-		$parser = new Parser($input);
-
+		$this->input = $input;
 		$output = '';
 
-		while ($parser->getCommand($text, $name, $arguments)) {
-			foreach ($arguments as &$argument) {
-				if (is_string($argument)) {
-					$argument = $this->run($argument);
-				}
+		$nodes = parent::parse($input);
+
+		foreach ($nodes as $node) {
+			if (is_object($node)) {
+				/** @var Command $node */
+				$value = $node->run();
+			} else {
+				$value = $node;
 			}
 
-			$output .= $text . $this->command($name, $arguments);
+			$output .= $value;
 		}
-
-		$output .= $parser->getText();
 
 		return $output;
 	}
 
-	private function get($name)
+	public function getExpression(array $parts)
 	{
-		$service = &$this->services[$name];
+		list($commands, $text) = $parts;
 
-		if ($service === null) {
-			$service = $this->service($name);
+		if ($text !== null) {
+			$commands[] = $text;
 		}
 
-		return $service;
+		return $commands;
+	}
+
+	public function getCommands(array $segments)
+	{
+		if (count($segments) === 0) {
+			return array();
+		}
+
+		$commands = call_user_func_array('array_merge', $segments);
+		$commands = array_filter($commands, array($this, 'isNotNull'));
+		return array_values($commands);
+	}
+
+	public function isNotNull($input)
+	{
+		return $input !== null;
+	}
+
+	public function getText($text)
+	{
+		if (strlen($text) === 0) {
+			return null;
+		}
+
+		return $text;
+	}
+
+	public function getCommand(array $parts)
+	{
+		$name = $parts[1];
+		$arguments = $parts[2];
+
+		$class = '\\Synerga\\Commands\\Command' . ucfirst($name);
+		return new $class($this->objects, $arguments);
+	}
+
+	public function getArgumentSegment(array $segment)
+	{
+		return $segment[1];
+	}
+
+	public function getValue($json)
+	{
+		return json_decode($json, true);
 	}
 }
