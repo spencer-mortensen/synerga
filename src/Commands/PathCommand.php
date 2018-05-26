@@ -25,7 +25,7 @@
 
 namespace Synerga\Commands;
 
-class CommandPath extends Command
+class PathCommand extends Command
 {
 	public function run()
 	{

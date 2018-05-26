@@ -27,7 +27,7 @@ namespace Synerga\Commands;
 
 use Synerga\Synerga;
 
-class CommandInclude extends Command
+class IncludeCommand extends Command
 {
 	public function run()
 	{

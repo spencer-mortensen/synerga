@@ -25,20 +25,25 @@
 
 namespace Synerga;
 
+use ErrorException;
 use Synerga\Commands\Command;
 use SpencerMortensen\Parser\String\Parser;
 use SpencerMortensen\Parser\String\Rules;
 
 class Synerga extends Parser
 {
+	/** @var array */
+	private $commandNamespaces;
+
 	/** @var Objects */
 	private $objects;
 
 	/** @var string */
 	private $input;
 
-	public function __construct()
+	public function __construct(array $commandNamespaces)
 	{
+		$this->commandNamespaces = $commandNamespaces; // e.g. array("Example\\Application\\Commands", "Synerga\\Commands")
 		$this->objects = new Objects();
 		$this->objects->set('synerga', $this);
 
@@ -135,8 +140,17 @@ EOS;
 		$name = $parts[1];
 		$arguments = $parts[2];
 
-		$class = '\\Synerga\\Commands\\Command' . ucfirst($name);
-		return new $class($this->objects, $arguments);
+		$className = ucfirst($name) . 'Command';
+
+		foreach ($this->commandNamespaces as $namespace) {
+			$class = "\\{$namespace}\\{$className}";
+
+			if (class_exists($class, true)) {
+				return new $class($this->objects, $arguments);
+			}
+		}
+
+		throw new ErrorException("Unknown command: {$name}");
 	}
 
 	public function getArgumentSegment(array $segment)

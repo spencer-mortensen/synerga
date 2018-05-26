@@ -25,11 +25,40 @@
 
 namespace Synerga\Commands;
 
-class CommandRouter extends Command
+use InvalidArgumentException;
+
+class IfCommand extends Command
 {
 	public function run()
 	{
-		$router = $this->objects->get('router');
-		$router->run();
+		$n = count($this->arguments) - 1;
+
+		for ($i = 0; $i < $n; ++$i) {
+			$antecedent = $this->getValue($i);
+
+			if (!is_bool($antecedent)) {
+				throw new InvalidArgumentException();
+			}
+
+			++$i;
+
+			if ($antecedent) {
+				return $this->getValue($i);
+			}
+		}
+
+		return $this->getValue($i);
+	}
+
+	private function getValue($i)
+	{
+		$consequent = $this->arguments[$i];
+
+		if (is_object($consequent)) {
+			/** @var Command $consequent */
+			$consequent = $consequent->run();
+		}
+
+		return $consequent;
 	}
 }

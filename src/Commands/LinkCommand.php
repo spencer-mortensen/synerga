@@ -25,7 +25,7 @@
 
 namespace Synerga\Commands;
 
-class CommandLink extends Command
+class LinkCommand extends Command
 {
 	public function run()
 	{
