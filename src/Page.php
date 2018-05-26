@@ -42,6 +42,6 @@ class Page
 	public function send($path)
 	{
 		$contents = $this->data->read($path);
-		echo $this->synerga->run($contents);
+		echo $this->synerga->evaluate($contents);
 	}
 }

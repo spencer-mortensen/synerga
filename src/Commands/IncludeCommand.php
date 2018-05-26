@@ -37,8 +37,8 @@ class IncludeCommand extends Command
 		$synerga = $this->objects->get('synerga');
 		$data = $this->objects->get('data');
 
-		$path = $synerga->run($path);
+		$path = $synerga->evaluate($path);
 		$contents = $data->read($path);
-		return $synerga->run($contents);
+		return $synerga->evaluate($contents);
 	}
 }

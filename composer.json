@@ -22,8 +22,8 @@
     "require": {
         "php": ">=5.4.0",
         "spencer-mortensen/autoloader": "~1.0",
-        "spencer-mortensen/html5": "~1.0",
-        "spencer-mortensen/parser": "~3.0"
+        "spencer-mortensen/html5": "~1.1",
+        "spencer-mortensen/parser": "~4.0"
     },
     "autoload": {
         "psr-4": {

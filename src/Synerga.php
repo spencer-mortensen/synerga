@@ -38,6 +38,9 @@ class Synerga extends Parser
 	/** @var Objects */
 	private $objects;
 
+	/** @var Rule */
+	private $rule;
+
 	/** @var string */
 	private $input;
 
@@ -69,12 +72,10 @@ commandEnd: STRING :>
 EOS;
 
 		$rules = new Rules($this, $grammar);
-		$rule = $rules->getRule('expression');
-
-		parent::__construct($rule);
+		$this->rule = $rules->getRule('expression');
 	}
 
-	public function run($input)
+	public function evaluate($input)
 	{
 		if (!is_string($input)) {
 			return null;
@@ -83,7 +84,7 @@ EOS;
 		$this->input = $input;
 		$output = '';
 
-		$nodes = parent::parse($input);
+		$nodes = $this->run($this->rule, $this->input);
 
 		foreach ($nodes as $node) {
 			if (is_object($node)) {
