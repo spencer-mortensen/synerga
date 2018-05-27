@@ -25,12 +25,20 @@
 
 namespace Synerga\Commands;
 
-class PathCommand extends Command
+use Synerga\Url;
+
+class PathCommand
 {
+	/** @var Url */
+	private $url;
+
+	public function __construct(Url $url)
+	{
+		$this->url = $url;
+	}
+
 	public function run()
 	{
-		$url = $this->objects->get('url');
-
-		return $url->getPath();
+		return $this->url->getPath();
 	}
 }

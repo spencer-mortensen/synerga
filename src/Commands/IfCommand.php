@@ -26,15 +26,26 @@
 namespace Synerga\Commands;
 
 use InvalidArgumentException;
+use Synerga\Evaluator;
 
-class IfCommand extends Command
+class IfCommand
 {
+	/** @var Evaluator */
+	private $evaluator;
+
+	public function __construct(Evaluator $evaluator)
+	{
+		$this->evaluator = $evaluator;
+	}
+
 	public function run()
 	{
-		$n = count($this->arguments) - 1;
+		$arguments = func_get_args();
+
+		$n = count($arguments) - 1;
 
 		for ($i = 0; $i < $n; ++$i) {
-			$antecedent = $this->getValue($i);
+			$antecedent = $this->getValue($arguments[$i]);
 
 			if (!is_bool($antecedent)) {
 				throw new InvalidArgumentException();
@@ -43,22 +54,21 @@ class IfCommand extends Command
 			++$i;
 
 			if ($antecedent) {
-				return $this->getValue($i);
+				return $this->getValue($arguments[$i]);
 			}
 		}
 
-		return $this->getValue($i);
+		$argument = $arguments[$i];
+		return $this->getValue($argument);
 	}
 
-	private function getValue($i)
+	private function getValue($argument)
 	{
-		$consequent = $this->arguments[$i];
-
-		if (is_object($consequent)) {
-			/** @var Command $consequent */
-			$consequent = $consequent->run();
+		if (is_object($argument)) {
+			/** @var Command $argument */
+			return $this->evaluator->run($argument);
 		}
 
-		return $consequent;
+		return $argument;
 	}
 }

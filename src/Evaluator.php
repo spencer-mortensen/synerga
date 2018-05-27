@@ -23,19 +23,29 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Services;
+namespace Synerga;
 
-use Synerga\Router;
+use ErrorException;
 
-class ServiceRouter extends Service
+class Evaluator
 {
-	public function getObject()
-	{
-		$data = $this->objects->get('data');
-		$url = $this->objects->get('url');
-		$page = $this->objects->get('page');
-		$file = $this->objects->get('file');
+	/** @var array */
+	private $objects;
 
-		return new Router($data, $url, $page, $file);
+	public function __construct(Objects $objects)
+	{
+		$this->objects = $objects;
+	}
+
+	public function run(Command $command)
+	{
+		$name = $command->getName();
+		$arguments = $command->getArguments();
+
+		$objectName = 'command' . ucfirst($name);
+		$object = $this->objects->get($objectName);
+		$callable = array($object, 'run');
+
+		return call_user_func_array($callable, $arguments);
 	}
 }

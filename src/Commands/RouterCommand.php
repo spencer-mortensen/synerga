@@ -25,11 +25,80 @@
 
 namespace Synerga\Commands;
 
-class RouterCommand extends Command
+use Synerga\Data;
+use Synerga\File;
+use Synerga\Page;
+use Synerga\Url;
+
+class RouterCommand
 {
+	/** @var Data */
+	private $data;
+
+	/** @var Url */
+	private $url;
+
+	/** @var Page */
+	private $page;
+
+	/** @var File */
+	private $file;
+
+	public function __construct(Data $data, Url $url, Page $page, File $file)
+	{
+		$this->data = $data;
+		$this->url = $url;
+		$this->page = $page;
+		$this->file = $file;
+	}
+
 	public function run()
 	{
-		$router = $this->objects->get('router');
-		$router->run();
+		list($routing, $defaultTheme) = $this->getRouting();
+		$path = $this->url->getPath();
+
+		$theme = &$routing[$path];
+
+		if (isset($theme)) {
+			$this->page->send($theme);
+			return;
+		}
+
+		$pathType = $this->url->getType();
+
+		if ($pathType === 'page') {
+			$this->page->send($defaultTheme);
+		} else {
+			$this->file->send($path);
+		}
+	}
+
+	private function getRouting()
+	{
+		$contents = $this->data->read('.config/routing');
+
+		if ($contents === null) {
+			return null;
+		}
+
+		$settings = json_decode($contents, true);
+
+		if (!is_array($settings)) {
+			return null;
+		}
+
+		$routing = &$settings[0];
+
+		if (!is_array($routing)) {
+			return null;
+		}
+
+		$defaultTheme = &$settings[1];
+
+		if (!is_string($defaultTheme)) {
+			return null;
+		}
+
+		return array($routing, $defaultTheme);
 	}
 }

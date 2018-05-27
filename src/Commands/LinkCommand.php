@@ -25,15 +25,30 @@
 
 namespace Synerga\Commands;
 
-class LinkCommand extends Command
+use SpencerMortensen\Html5\Html5;
+use Synerga\Url;
+
+class LinkCommand
 {
-	public function run()
+	/** @var Url */
+	private $url;
+
+	public function __construct(Url $url)
 	{
-		$textHtml = $this->arguments[0];
-		$linkPath = $this->arguments[1];
+		$this->url = $url;
+	}
 
-		$link = $this->objects->get('link');
+	public function run($textHtml, $linkPath)
+	{
+		$attributes = array();
 
-		return $link->getHtml($textHtml, $linkPath);
+		$pagePath = $this->url->getPath();
+
+		if ($linkPath !== $pagePath) {
+			$url = $this->url->getUrl($linkPath);
+			$attributes['href'] = $url;
+		}
+
+		return Html5::getElementHtml('a', $attributes, $textHtml);
 	}
 }

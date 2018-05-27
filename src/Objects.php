@@ -25,15 +25,19 @@
 
 namespace Synerga;
 
-use Synerga\Services\Service;
+use ErrorException;
 
 class Objects
 {
 	/** @var array */
+	private $factories;
+
+	/** @var array */
 	private $objects;
 
-	public function __construct()
+	public function __construct(array $factories)
 	{
+		$this->factories = $factories;
 		$this->objects = array();
 	}
 
@@ -46,13 +50,25 @@ class Objects
 	{
 		$object = &$this->objects[$name];
 
-		if ($object !== null) {
-			return $object;
+		if ($object === null) {
+			$object = $this->instantiate($name);
 		}
 
-		/** @var Service $service */
-		$class = '\\Synerga\\Services\\Service' . ucfirst($name);
-		$service = new $class($this);
-		return $service->getObject();
+		return $object;
+	}
+
+	private function instantiate($name)
+	{
+		$method = 'new' . ucfirst($name);
+
+		foreach ($this->factories as $factory) {
+			$callable = array($factory, $method);
+
+			if (is_callable($callable)) {
+				return call_user_func($callable, $this);
+			}
+		}
+
+		throw new ErrorException("Unknown object: {$name}");
 	}
 }

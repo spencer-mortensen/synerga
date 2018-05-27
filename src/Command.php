@@ -23,16 +23,29 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Services;
+namespace Synerga;
 
-use Synerga\Mime;
-
-class ServiceMime extends Service
+class Command
 {
-	public function getObject()
-	{
-		$data = $this->objects->get('data');
+	/** @var string */
+	private $name;
 
-		return new Mime($data);
+	/** @var array */
+	private $arguments;
+
+	public function __construct($name, array $arguments)
+	{
+		$this->name = $name;
+		$this->arguments = $arguments;
+	}
+
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	public function getArguments()
+	{
+		return $this->arguments;
 	}
 }

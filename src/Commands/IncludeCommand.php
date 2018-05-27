@@ -25,20 +25,27 @@
 
 namespace Synerga\Commands;
 
-use Synerga\Synerga;
+use Synerga\Scanner;
+use Synerga\Data;
 
-class IncludeCommand extends Command
+class IncludeCommand
 {
-	public function run()
+	/** @var Scanner */
+	private $scanner;
+
+	/** @var Data */
+	private $data;
+
+	public function __construct(Scanner $scanner, Data $data)
 	{
-		$path = $this->arguments[0];
+		$this->scanner = $scanner;
+		$this->data = $data;
+	}
 
-		/** @var Synerga $synerga */
-		$synerga = $this->objects->get('synerga');
-		$data = $this->objects->get('data');
-
-		$path = $synerga->evaluate($path);
-		$contents = $data->read($path);
-		return $synerga->evaluate($contents);
+	public function run($path)
+	{
+		$path = $this->scanner->scan($path);
+		$contents = $this->data->read($path);
+		return $this->scanner->scan($contents);
 	}
 }

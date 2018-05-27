@@ -27,140 +27,20 @@ namespace Synerga;
 
 use ErrorException;
 use Synerga\Commands\Command;
-use SpencerMortensen\Parser\String\Parser;
-use SpencerMortensen\Parser\String\Rules;
 
-class Synerga extends Parser
+class Synerga
 {
-	/** @var array */
-	private $commandNamespaces;
+	/** @var Scanner */
+	private $scanner;
 
-	/** @var Objects */
-	private $objects;
-
-	/** @var Rule */
-	private $rule;
-
-	/** @var string */
-	private $input;
-
-	public function __construct(array $commandNamespaces)
+	public function __construct(array $factories)
 	{
-		$this->commandNamespaces = $commandNamespaces; // e.g. array("Example\\Application\\Commands", "Synerga\\Commands")
-		$this->objects = new Objects();
-		$this->objects->set('synerga', $this);
-
-		$grammar = <<<'EOS'
-expression: AND commands text
-commands: MANY commandSegment 0
-commandSegment: AND text command
-text: RE .*?(?=<:|$)
-command: AND commandBegin identifier arguments optionalSpace commandEnd
-commandBegin: STRING <:
-identifier: RE [a-zA-Z_0-9]+
-arguments: MANY argumentSegment 0
-argumentSegment: AND space argument
-space: RE \s+
-argument: OR value command
-value: OR null boolean number string
-null: STRING null
-boolean: RE (?:false|true)
-number: RE -?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?
-string: RE "(?:[^\x00-\x1f"\\]|\\(?:["\\/bfnrt]|u[0-9a-f]{4}))*"
-optionalSpace: RE \s*
-commandEnd: STRING :>
-EOS;
-
-		$rules = new Rules($this, $grammar);
-		$this->rule = $rules->getRule('expression');
+		$objects = new Objects($factories);
+		$this->scanner = $objects->get('scanner');
 	}
 
-	public function evaluate($input)
+	public function run($input)
 	{
-		if (!is_string($input)) {
-			return null;
-		}
-
-		$this->input = $input;
-		$output = '';
-
-		$nodes = $this->run($this->rule, $this->input);
-
-		foreach ($nodes as $node) {
-			if (is_object($node)) {
-				/** @var Command $node */
-				$value = $node->run();
-			} else {
-				$value = $node;
-			}
-
-			$output .= $value;
-		}
-
-		return $output;
-	}
-
-	public function getExpression(array $parts)
-	{
-		list($commands, $text) = $parts;
-
-		if ($text !== null) {
-			$commands[] = $text;
-		}
-
-		return $commands;
-	}
-
-	public function getCommands(array $segments)
-	{
-		if (count($segments) === 0) {
-			return array();
-		}
-
-		$commands = call_user_func_array('array_merge', $segments);
-		$commands = array_filter($commands, array($this, 'isNotNull'));
-		return array_values($commands);
-	}
-
-	public function isNotNull($input)
-	{
-		return $input !== null;
-	}
-
-	public function getText($text)
-	{
-		if (strlen($text) === 0) {
-			return null;
-		}
-
-		return $text;
-	}
-
-	public function getCommand(array $parts)
-	{
-		$name = $parts[1];
-		$arguments = $parts[2];
-
-		$className = ucfirst($name) . 'Command';
-
-		foreach ($this->commandNamespaces as $namespace) {
-			$class = "\\{$namespace}\\{$className}";
-
-			if (class_exists($class, true)) {
-				return new $class($this->objects, $arguments);
-			}
-		}
-
-		throw new ErrorException("Unknown command: {$name}");
-	}
-
-	public function getArgumentSegment(array $segment)
-	{
-		return $segment[1];
-	}
-
-	public function getValue($json)
-	{
-		return json_decode($json, true);
+		return $this->scanner->scan($input);
 	}
 }

@@ -23,14 +23,45 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Services;
+namespace Synerga;
 
-use Synerga\Data;
-
-class ServiceData extends Service
+class Scanner
 {
-	public function getObject()
+	/** @var Parser */
+	private $parser;
+
+	public function __construct(Parser $parser, Evaluator $evaluator)
 	{
-		return new Data($GLOBALS['data']);
+		$this->parser = $parser;
+		$this->evaluator = $evaluator;
+	}
+
+	public function scan($input)
+	{
+		while ($this->seek($input, $output)) {
+			$command = $this->parser->parse($input);
+			$output .= $this->evaluator->run($command);
+		}
+
+		return $output;
+	}
+
+	private function seek(&$input, &$output)
+	{
+		if (strlen($input) === 0) {
+			return false;
+		}
+
+		$i = strpos($input, '<:');
+
+		if (is_int($i)) {
+			$output .= substr($input, 0, $i);
+			$input = substr($input, $i);
+			return true;
+		} else {
+			$output .= $input;
+			$input = '';
+			return false;
+		}
 	}
 }

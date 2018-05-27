@@ -27,21 +27,21 @@ namespace Synerga;
 
 class Page
 {
-	/** @var Synerga */
-	private $synerga;
+	/** @var Scanner */
+	private $scanner;
 
 	/** @var Data */
 	private $data;
 
-	public function __construct(Synerga $synerga, Data $data)
+	public function __construct(Scanner $scanner, Data $data)
 	{
-		$this->synerga = $synerga;
+		$this->scanner = $scanner;
 		$this->data = $data;
 	}
 
 	public function send($path)
 	{
 		$contents = $this->data->read($path);
-		echo $this->synerga->evaluate($contents);
+		echo $this->scanner->scan($contents);
 	}
 }
