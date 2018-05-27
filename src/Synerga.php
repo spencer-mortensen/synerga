@@ -33,8 +33,12 @@ class Synerga
 	/** @var Scanner */
 	private $scanner;
 
-	public function __construct(array $factories)
+	public function __construct(array $factories = null)
 	{
+		if ($factories === null) {
+			$factories = array(new Factory());
+		}
+
 		$objects = new Objects($factories);
 		$this->scanner = $objects->get('scanner');
 	}

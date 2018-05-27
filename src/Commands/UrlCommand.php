@@ -23,29 +23,22 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-class Command
+use Synerga\Url;
+
+class UrlCommand
 {
-	/** @var string */
-	private $name;
+	/** @var Url */
+	private $url;
 
-	/** @var array */
-	private $arguments;
-
-	public function __construct($name, array $arguments)
+	public function __construct(Url $url)
 	{
-		$this->name = $name;
-		$this->arguments = $arguments;
+		$this->url = $url;
 	}
 
-	public function getName()
+	public function run($path)
 	{
-		return $this->name;
-	}
-
-	public function getArguments()
-	{
-		return $this->arguments;
+		return $this->url->getUrl($path);
 	}
 }

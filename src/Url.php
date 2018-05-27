@@ -28,20 +28,15 @@ namespace Synerga;
 class Url
 {
 	/** @var string */
-	private $base;
+	private $baseUrl;
 
 	/** @var string */
 	private $path;
 
-	public function __construct($base, $path)
+	public function __construct($baseUrl, $path)
 	{
-		$this->base = $base;
+		$this->baseUrl = $baseUrl;
 		$this->path = $path;
-	}
-
-	public function getBase()
-	{
-		return $this->base;
 	}
 
 	public function getPath()
@@ -49,25 +44,73 @@ class Url
 		return $this->path;
 	}
 
-	public function getUrl($path = null)
+	public function getUrl($path)
 	{
-		if ($path === null) {
-			$path = $this->path;
+		$absoluteUrl = self::getAbsoluteUrl($this->baseUrl, $path);
+		$relativeUrl = self::getRelativeUrl($this->path, $path);
+
+		if (strlen($relativeUrl) < strlen($absoluteUrl)) {
+			return $relativeUrl;
 		}
 
-		return "{$this->base}{$path}";
+		return $absoluteUrl;
 	}
 
-	public function getType($path = null)
+	private static function getAbsoluteUrl($baseUrl, $path)
 	{
-		if ($path === null) {
-			$path = $this->path;
+		return $baseUrl . $path;
+	}
+
+	private static function getRelativeUrl($aPath, $bPath)
+	{
+		$aAtoms = self::getAtoms($aPath);
+		$bAtoms = self::getAtoms($bPath);
+
+		$aCount = count($aAtoms);
+		$bCount = count($bAtoms);
+
+		for ($i = 0, $n = min($aCount, $bCount); ($i < $n) && ($aAtoms[$i] === $bAtoms[$i]); ++$i);
+
+		$cAtoms = array_fill(0, $aCount - $i, '..');
+
+		$cTailAtoms = array_slice($bAtoms, $i);
+
+		if (0 < count($cTailAtoms)) {
+			$isPage = self::isPagePath($bPath);
+			$cAtoms[] = self::getUrlFromAtoms($cTailAtoms, $isPage);
 		}
 
-		if ((strlen($path) === 0) || substr($path, -1) === '/') {
-			return 'page';
+		return self::getUrlFromAtoms($cAtoms, false);
+	}
+
+	private static function getAtoms($path)
+	{
+		$path = rtrim($path, '/');
+
+		if (strlen($path) === 0) {
+			return array();
 		}
 
-		return 'file';
+		return explode('/', $path);
+	}
+
+	private static function isPagePath($path)
+	{
+		return (strlen($path) === 0) || (substr($path, -1) === '/');
+	}
+
+	private static function getUrlFromAtoms(array $atoms, $isPage)
+	{
+		if (count($atoms) === 0) {
+			return '.';
+		}
+
+		$url = implode('/', $atoms);
+
+		if ($isPage) {
+			$url .= '/';
+		}
+
+		return $url;
 	}
 }

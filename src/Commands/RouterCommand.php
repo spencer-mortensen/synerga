@@ -44,7 +44,7 @@ class RouterCommand
 	/** @var File */
 	private $file;
 
-	public function __construct(Data $data, Url $url, Page $page, File $file)
+	public function __construct(Url $url, Data $data, Page $page, File $file)
 	{
 		$this->data = $data;
 		$this->url = $url;
@@ -64,12 +64,10 @@ class RouterCommand
 			return;
 		}
 
-		$pathType = $this->url->getType();
-
-		if ($pathType === 'page') {
-			$this->page->send($defaultTheme);
-		} else {
+		if ($this->isFile($path)) {
 			$this->file->send($path);
+		} else {
+			$this->page->send($defaultTheme);
 		}
 	}
 
@@ -100,5 +98,10 @@ class RouterCommand
 		}
 
 		return array($routing, $defaultTheme);
+	}
+
+	private function isFile($path)
+	{
+		return (0 < strlen($path)) && (substr($path, -1) !== '/');
 	}
 }

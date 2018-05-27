@@ -23,32 +23,29 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use SpencerMortensen\Html5\Html5;
-use Synerga\Url;
-
-class LinkCommand
+class ParserCommand
 {
-	/** @var Url */
-	private $url;
+	/** @var string */
+	private $name;
 
-	public function __construct(Url $url)
+	/** @var array */
+	private $arguments;
+
+	public function __construct($name, array $arguments)
 	{
-		$this->url = $url;
+		$this->name = $name;
+		$this->arguments = $arguments;
 	}
 
-	public function run($textHtml, $linkPath)
+	public function getName()
 	{
-		$attributes = array();
+		return $this->name;
+	}
 
-		$pagePath = $this->url->getPath();
-
-		if ($linkPath !== $pagePath) {
-			$url = $this->url->getUrl($linkPath);
-			$attributes['href'] = $url;
-		}
-
-		return Html5::getElementHtml('a', $attributes, $textHtml);
+	public function getArguments()
+	{
+		return $this->arguments;
 	}
 }

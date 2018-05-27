@@ -37,7 +37,7 @@ class Evaluator
 		$this->objects = $objects;
 	}
 
-	public function run(Command $command)
+	public function run(ParserCommand $command)
 	{
 		$name = $command->getName();
 		$arguments = $command->getArguments();

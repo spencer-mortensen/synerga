@@ -78,7 +78,7 @@ EOS;
 		$name = $matches[1];
 		$arguments = $matches[2];
 
-		return new Command($name, $arguments);
+		return new ParserCommand($name, $arguments);
 	}
 
 	public function getArgumentSegment(array $segment)

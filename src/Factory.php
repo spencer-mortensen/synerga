@@ -27,9 +27,9 @@ namespace Synerga;
 
 use Synerga\Commands\IfCommand;
 use Synerga\Commands\IncludeCommand;
-use Synerga\Commands\LinkCommand;
 use Synerga\Commands\PathCommand;
 use Synerga\Commands\RouterCommand;
+use Synerga\Commands\UrlCommand;
 
 class Factory
 {
@@ -48,13 +48,6 @@ class Factory
 		return new IncludeCommand($scanner, $data);
 	}
 
-	public function newCommandLink(Objects $objects)
-	{
-		$url = $objects->get('url');
-
-		return new LinkCommand($url);
-	}
-
 	public function newCommandPath(Objects $objects)
 	{
 		$url = $objects->get('url');
@@ -64,12 +57,19 @@ class Factory
 
 	public function newCommandRouter(Objects $objects)
 	{
-		$data = $objects->get('data');
 		$url = $objects->get('url');
+		$data = $objects->get('data');
 		$page = $objects->get('page');
 		$file = $objects->get('file');
 
-		return new RouterCommand($data, $url, $page, $file);
+		return new RouterCommand($url, $data, $page, $file);
+	}
+
+	public function newCommandUrl(Objects $objects)
+	{
+		$url = $objects->get('url');
+
+		return new UrlCommand($url);
 	}
 
 	public function newData()
@@ -120,6 +120,9 @@ class Factory
 
 	public function newUrl()
 	{
-		return new Url($_SERVER['SYNERGA_BASE'], $_SERVER['SYNERGA_PATH']);
+		$baseUrl = $_SERVER['SYNERGA_BASE'];
+		$path = $_SERVER['SYNERGA_PATH'];
+
+		return new Url($baseUrl, $path);
 	}
 }

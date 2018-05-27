@@ -35,6 +35,7 @@ class Data
 		$this->dataDirectory = $dataDirectory;
 	}
 
+	// TODO: use the filesystem class
 	public function read($path)
 	{
 		$filePath = $this->getFilePath($path);
