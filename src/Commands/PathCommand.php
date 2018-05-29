@@ -37,7 +37,7 @@ class PathCommand
 		$this->url = $url;
 	}
 
-	public function run($linkPath = null)
+	public function run()
 	{
 		return $this->url->getPath();
 	}

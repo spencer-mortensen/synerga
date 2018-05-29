@@ -100,6 +100,7 @@ class RouterCommand
 		return array($routing, $defaultTheme);
 	}
 
+	// TODO: this is duplicated in the "Url" class
 	private function isFile($path)
 	{
 		return (0 < strlen($path)) && (substr($path, -1) !== '/');

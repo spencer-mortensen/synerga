@@ -94,6 +94,7 @@ class Url
 		return explode('/', $path);
 	}
 
+	// TODO: this is duplicated in the "Commands/RouterCommand" class
 	private static function isPagePath($path)
 	{
 		return (strlen($path) === 0) || (substr($path, -1) === '/');
