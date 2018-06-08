@@ -25,9 +25,6 @@
 
 namespace Synerga;
 
-use ErrorException;
-use Synerga\Commands\Command;
-
 class Synerga
 {
 	/** @var Scanner */

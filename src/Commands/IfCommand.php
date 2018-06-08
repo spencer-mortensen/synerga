@@ -65,7 +65,6 @@ class IfCommand
 	private function getValue($argument)
 	{
 		if (is_object($argument)) {
-			/** @var Command $argument */
 			return $this->evaluator->run($argument);
 		}
 

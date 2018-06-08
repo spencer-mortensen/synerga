@@ -27,7 +27,7 @@ namespace Synerga;
 
 class Url
 {
-	/** @var string */
+	/** @var string|null */
 	private $baseUrl;
 
 	/** @var string */
@@ -46,8 +46,13 @@ class Url
 
 	public function getUrl($path)
 	{
-		$absoluteUrl = self::getAbsoluteUrl($this->baseUrl, $path);
 		$relativeUrl = self::getRelativeUrl($this->path, $path);
+
+		if ($this->baseUrl === null) {
+			return $relativeUrl;
+		}
+
+		$absoluteUrl = self::getAbsoluteUrl($this->baseUrl, $path);
 
 		if (strlen($relativeUrl) < strlen($absoluteUrl)) {
 			return $relativeUrl;

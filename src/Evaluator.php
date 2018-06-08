@@ -25,8 +25,6 @@
 
 namespace Synerga;
 
-use ErrorException;
-
 class Evaluator
 {
 	/** @var array */
@@ -42,10 +40,19 @@ class Evaluator
 		$name = $command->getName();
 		$arguments = $command->getArguments();
 
-		$objectName = 'command' . ucfirst($name);
+		$objectName = $this->getObjectName($name);
 		$object = $this->objects->get($objectName);
 		$callable = array($object, 'run');
 
 		return call_user_func_array($callable, $arguments);
+	}
+
+	private function getObjectName($name)
+	{
+		$expression = '[_-]';
+		$pattern = "\x03{$expression}\x03";
+		$words = preg_split($pattern, $name);
+		$words = array_map('ucfirst', $words);
+		return 'command' . implode('', $words);
 	}
 }

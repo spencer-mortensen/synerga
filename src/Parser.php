@@ -31,12 +31,6 @@ use SpencerMortensen\Parser\String\Rules;
 
 class Parser extends StringParser
 {
-	/** @var array */
-	private $commandNamespaces;
-
-	/** @var Objects */
-	private $objects;
-
 	/** @var Rule */
 	private $rule;
 
@@ -45,7 +39,7 @@ class Parser extends StringParser
 		$grammar = <<<'EOS'
 command: AND commandBegin identifier arguments optionalSpace commandEnd
 commandBegin: STRING <:
-identifier: RE [a-zA-Z_0-9]+
+identifier: RE [a-zA-Z0-9_-]+
 arguments: MANY argumentSegment 0
 argumentSegment: AND space argument
 space: RE \s+
