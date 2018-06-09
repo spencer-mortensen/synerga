@@ -42,7 +42,7 @@ class Evaluator
 
 		$objectName = $this->getObjectName($name);
 		$object = $this->objects->get($objectName);
-		$callable = array($object, 'run');
+		$callable = [$object, 'run'];
 
 		return call_user_func_array($callable, $arguments);
 	}

@@ -97,7 +97,7 @@ class RouterCommand
 			return null;
 		}
 
-		return array($routing, $defaultTheme);
+		return [$routing, $defaultTheme];
 	}
 
 	// TODO: this is duplicated in the "Url" class

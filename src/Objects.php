@@ -38,7 +38,7 @@ class Objects
 	public function __construct(array $factories)
 	{
 		$this->factories = $factories;
-		$this->objects = array();
+		$this->objects = [];
 	}
 
 	public function set($name, $object)
@@ -62,7 +62,7 @@ class Objects
 		$method = 'new' . ucfirst($name);
 
 		foreach ($this->factories as $factory) {
-			$callable = array($factory, $method);
+			$callable = [$factory, $method];
 
 			if (is_callable($callable)) {
 				return call_user_func($callable, $this);

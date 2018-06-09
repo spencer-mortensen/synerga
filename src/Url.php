@@ -93,7 +93,7 @@ class Url
 		$path = rtrim($path, '/');
 
 		if (strlen($path) === 0) {
-			return array();
+			return [];
 		}
 
 		return explode('/', $path);

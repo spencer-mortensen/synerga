@@ -33,7 +33,7 @@ class Synerga
 	public function __construct(array $factories = null)
 	{
 		if ($factories === null) {
-			$factories = array(new Factory());
+			$factories = [new Factory()];
 		}
 
 		$objects = new Objects($factories);
