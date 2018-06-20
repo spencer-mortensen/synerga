@@ -54,11 +54,11 @@ class Url
 
 		$absoluteUrl = self::getAbsoluteUrl($this->baseUrl, $path);
 
-		if (strlen($relativeUrl) < strlen($absoluteUrl)) {
-			return $relativeUrl;
+		if (strlen($absoluteUrl) < strlen($relativeUrl)) {
+			return $absoluteUrl;
 		}
 
-		return $absoluteUrl;
+		return $relativeUrl;
 	}
 
 	private static function getAbsoluteUrl($baseUrl, $path)
