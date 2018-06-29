@@ -67,9 +67,10 @@ class Factory
 
 	public function newCommandUrl(Objects $objects)
 	{
+		$scanner = $objects->get('scanner');
 		$url = $objects->get('url');
 
-		return new UrlCommand($url);
+		return new UrlCommand($scanner, $url);
 	}
 
 	public function newData()

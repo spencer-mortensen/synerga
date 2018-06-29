@@ -44,14 +44,21 @@ class Url
 		return $this->path;
 	}
 
-	public function getUrl($path)
+	public function getUrl($path, $isAbsolute)
 	{
-		$relativeUrl = self::getRelativeUrl($this->path, $path);
-
 		if ($this->baseUrl === null) {
-			return $relativeUrl;
+			return self::getRelativeUrl($this->path, $path);
 		}
 
+		if ($isAbsolute === true) {
+			return self::getAbsoluteUrl($this->baseUrl, $path);
+		}
+
+		if ($isAbsolute === false) {
+			return self::getRelativeUrl($this->path, $path);
+		}
+
+		$relativeUrl = self::getRelativeUrl($this->path, $path);
 		$absoluteUrl = self::getAbsoluteUrl($this->baseUrl, $path);
 
 		if (strlen($absoluteUrl) < strlen($relativeUrl)) {

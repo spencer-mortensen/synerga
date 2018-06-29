@@ -25,20 +25,26 @@
 
 namespace Synerga\Commands;
 
+use Synerga\Scanner;
 use Synerga\Url;
 
 class UrlCommand
 {
+	/** @var Scanner */
+	private $scanner;
+
 	/** @var Url */
 	private $url;
 
-	public function __construct(Url $url)
+	public function __construct(Scanner $scanner, Url $url)
 	{
+		$this->scanner = $scanner;
 		$this->url = $url;
 	}
 
-	public function run($path)
+	public function run($path, $isAbsolute = null)
 	{
-		return $this->url->getUrl($path);
+		$path = $this->scanner->scan($path);
+		return $this->url->getUrl($path, $isAbsolute);
 	}
 }
