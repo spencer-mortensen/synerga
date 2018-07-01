@@ -25,6 +25,7 @@
 
 namespace Synerga;
 
+use Synerga\Commands\DateCommand;
 use Synerga\Commands\IfCommand;
 use Synerga\Commands\IncludeCommand;
 use Synerga\Commands\PathCommand;
@@ -33,6 +34,13 @@ use Synerga\Commands\UrlCommand;
 
 class Factory
 {
+	public function newCommandDate(Objects $objects)
+	{
+		$evaluator = $objects->get('evaluator');
+
+		return new DateCommand($evaluator);
+	}
+
 	public function newCommandIf(Objects $objects)
 	{
 		$evaluator = $objects->get('evaluator');
