@@ -40,8 +40,8 @@ class Synerga
 		$this->scanner = $objects->get('scanner');
 	}
 
-	public function run($input)
+	public function run($text)
 	{
-		return $this->scanner->scan($input);
+		return $this->scanner->scan($text);
 	}
 }

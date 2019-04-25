@@ -41,7 +41,7 @@ class Page
 
 	public function send($path)
 	{
-		$contents = $this->data->read($path);
-		echo $this->scanner->scan($contents);
+		$text = $this->data->read($path);
+		echo $this->scanner->scan($text);
 	}
 }

@@ -25,63 +25,98 @@
 
 namespace Synerga;
 
-use SpencerMortensen\Parser\Rule;
-use SpencerMortensen\Parser\String\Parser as StringParser;
-use SpencerMortensen\Parser\String\Rules;
-
-class Parser extends StringParser
+class Parser
 {
-	/** @var Rule */
-	private $rule;
-
-	public function __construct()
+	public function parse(StringInput $input, ParserCommand &$command = null)
 	{
-		$grammar = <<<'EOS'
-command: AND commandBegin identifier arguments optionalSpace commandEnd
-commandBegin: STRING <:
-identifier: RE [a-zA-Z0-9_-]+
-arguments: MANY argumentSegment 0
-argumentSegment: AND space argument
-space: RE \s+
-argument: OR value command
-value: OR null boolean number string
-null: STRING null
-boolean: RE (?:false|true)
-number: RE -?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?
-string: RE "(?:[^\x00-\x1f"\\]|\\(?:["\\/bfnrt]|u[0-9a-f]{4}))*"
-optionalSpace: RE \s*
-commandEnd: STRING :>
-EOS;
-
-		$rules = new Rules($this, $grammar);
-		$this->rule = $rules->getRule('command');
+		return $this->getCommand($input, $command);
 	}
 
-	public function parse(&$input)
+	private function getCommand(StringInput $input, &$command)
 	{
-		$output = $this->run($this->rule, $input);
+		if (
+			$input->getLiteral('<:') &&
+			$input->getRe('[a-zA-Z0-9_-]+', $name) &&
+			$this->getArguments($input, $arguments) &&
+			$input->getRe('\\s*:>')
+		) {
+			$command = new ParserCommand($name, $arguments);
+			return true;
+		}
 
-		$position = $this->getPosition();
-		$input = substr($input, $position);
-
-		return $output;
+		return false;
 	}
 
-	public function getCommand(array $matches)
+	private function getArguments(StringInput $input, &$arguments)
 	{
-		$name = $matches[1];
-		$arguments = $matches[2];
+		$arguments = [];
 
-		return new ParserCommand($name, $arguments);
+		while (
+			$input->getRe('\\s+') &&
+			$this->getArgument($input, $argument)
+		) {
+			$arguments[] = $argument;
+		}
+
+		return true;
 	}
 
-	public function getArgumentSegment(array $segment)
+	private function getArgument(StringInput $input, &$argument)
 	{
-		return $segment[1];
+		return $this->getValue($input, $argument) ||
+			$this->getCommand($input, $argument);
 	}
 
-	public function getValue($json)
+	private function getValue(StringInput $input, &$value)
 	{
-		return json_decode($json, true);
+		return $this->getNull($input, $value) ||
+			$this->getBoolean($input, $value) ||
+			$this->getNumber($input, $value) ||
+			$this->getString($input, $value);
+	}
+
+	private function getNull(StringInput $input, &$value)
+	{
+		if ($input->getLiteral('null')) {
+			$value = null;
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getBoolean(StringInput $input, &$value)
+	{
+		if ($input->getLiteral('false')) {
+			$value = false;
+			return true;
+		}
+
+		if ($input->getLiteral('true')) {
+			$value = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getNumber(StringInput $input, &$value)
+	{
+		if ($input->getRe('-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?', $json)) {
+			$value = json_decode($json, true);
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getString(StringInput $input, &$value)
+	{
+		if ($input->getRe('"(?:[^\\x00-\\x1f"\\\\]|\\\\(?:["\\\\/bfnrt]|u[0-9a-f]{4}))*"', $json)) {
+			$value = json_decode($json, true);
+			return true;
+		}
+
+		return false;
 	}
 }

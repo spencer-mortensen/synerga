@@ -25,8 +25,8 @@
 
 namespace Synerga\Commands;
 
-use Synerga\Scanner;
 use Synerga\Data;
+use Synerga\Scanner;
 
 class IncludeCommand
 {

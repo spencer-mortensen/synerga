@@ -30,38 +30,69 @@ class Scanner
 	/** @var Parser */
 	private $parser;
 
+	/** @var Evaluator */
+	private $evaluator;
+
 	public function __construct(Parser $parser, Evaluator $evaluator)
 	{
 		$this->parser = $parser;
 		$this->evaluator = $evaluator;
 	}
 
-	public function scan($input)
+	public function scan(string $text): string
 	{
-		while ($this->seek($input, $output)) {
-			$command = $this->parser->parse($input);
-			$output .= $this->evaluator->run($command);
-		}
+		$input = new StringInput($text);
+
+		$this->getOutput($input, $output);
 
 		return $output;
 	}
 
-	private function seek(&$input, &$output)
+	public function getOutput(StringInput $input, &$output): bool
 	{
-		if (strlen($input) === 0) {
+		$output = '';
+
+		while (
+			$this->getCommand($input, $text) ||
+			$this->getText($input, $text)
+		) {
+			$output .= $text;
+		}
+
+		return true;
+	}
+
+	private function getText(StringInput $input, &$output): bool
+	{
+		$text = $input->getInput();
+		$iBegin = $input->getPosition();
+
+		if (strlen($text) <= $iBegin) {
 			return false;
 		}
 
-		$i = strpos($input, '<:');
+		$iEnd = strpos($text, '<:', $iBegin);
 
-		if (is_int($i)) {
-			$output .= substr($input, 0, $i);
-			$input = substr($input, $i);
+		if ($iBegin === $iEnd) {
+			return false;
+		}
+
+		if (!is_int($iEnd)) {
+			$iEnd = strlen($text);
+		}
+
+		$output = substr($text, $iBegin, $iEnd - $iBegin);
+		$input->setPosition($iEnd);
+		return true;
+	}
+
+	private function getCommand(StringInput $input, &$output): bool
+	{
+		if ($this->parser->parse($input, $command)) {
+			$output = $this->evaluator->run($command);
 			return true;
-		} else {
-			$output .= $input;
-			$input = '';
-			return false;
 		}
+
+		return false;
 	}
 }
