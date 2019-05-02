@@ -35,24 +35,30 @@ class Evaluator
 		$this->objects = $objects;
 	}
 
-	public function run(ParserCommand $command)
+	public function evaluate(Call $call)
 	{
-		$name = $command->getName();
-		$arguments = $command->getArguments();
-
-		$objectName = $this->getObjectName($name);
-		$object = $this->objects->get($objectName);
-		$callable = [$object, 'run'];
-
-		return call_user_func_array($callable, $arguments);
+		$command = $this->getCommand($call);
+		$arguments = $this->getArguments($call);
+		return $command->run($arguments);
 	}
 
-	private function getObjectName($name)
+	private function getCommand(Call $call)
 	{
-		$expression = '[_-]';
-		$pattern = "\x03{$expression}\x03";
-		$words = preg_split($pattern, $name);
+		$callName = $call->getName();
+		$commandName = $this->getCommandName($callName);
+		return $this->objects->get($commandName);
+	}
+
+	private function getCommandName($name)
+	{
+		$words = explode('-', strtolower($name));
 		$words = array_map('ucfirst', $words);
-		return 'command' . implode('', $words);
+		return lcfirst(implode('', $words)) . 'Command';
+	}
+
+	private function getArguments(Call $call)
+	{
+		$arguments = $call->getArguments();
+		return new Arguments($this, $arguments);
 	}
 }

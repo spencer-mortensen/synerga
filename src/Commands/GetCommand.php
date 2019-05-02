@@ -26,14 +26,21 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Variables;
 
-class DateCommand implements Command
+class GetCommand implements Command
 {
+	private $variables;
+
+	public function __construct(Variables $variables)
+	{
+		$this->variables = $variables;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		$name = $arguments->getString(0);
 
-		return date($format, $timestamp);
+		return $this->variables->get($name);
 	}
 }

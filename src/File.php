@@ -25,6 +25,8 @@
 
 namespace Synerga;
 
+use Exception;
+
 class File
 {
 	/** @var Data */
@@ -39,45 +41,59 @@ class File
 		$this->mime = $mime;
 	}
 
-	public function send($path)
+	public function send(string $path)
+	{
+		$eTag = $this->getETag($path);
+
+		$this->sendETagHeader($eTag);
+
+		$this->sendUnmodifiedHeader($eTag) ||
+		$this->sendFile($path);
+
+		exit(0);
+	}
+
+	private function getETag(string $path)
 	{
 		$mtime = $this->data->mtime($path);
 
 		if ($mtime === null) {
-			header('HTTP/1.0 404 Not Found');
-			exit(0);
+			throw new Exception('Unable to read the file modification time.');
 		}
 
-		$eTag = self::getETag($mtime);
-		header("ETag: \"{$eTag}\"");
-
-		if (isset($_SERVER['HTTP_IF_NONE_MATCH']))
-		{
-			// For GET or HEAD methods:
-			if ($eTag === trim($_SERVER['HTTP_IF_NONE_MATCH'], ' "'))
-			{
-				// For GET or HEAD methods:
-				header('HTTP/1.1 304 Not Modified');
-				exit(0);
-			}
-
-			// For all other methods:
-			// 412 Precondition Failed
-		}
-
-		$mimeType = $this->mime->getType($path);
-		header("Content-Type: {$mimeType}");
-
-		$content = $this->data->read($path);
-		$contentLength = strlen($content);
-		header("Content-Length: {$contentLength}");
-
-		$this->data->send($path);
-		exit(0);
+		return base_convert($mtime, 10, 36);
 	}
 
-	private static function getETag($mtime)
+	private function sendETagHeader(string $eTag)
 	{
-		return base_convert($mtime, 10, 36);
+		header("ETag: \"{$eTag}\"");
+	}
+
+	private function sendUnmodifiedHeader(string $serverETag)
+	{
+		$method = $_SERVER['REQUEST_METHOD'];
+		$clientETag = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH'], ' "') : null;
+
+		if (
+			(($method === 'GET') || ($method === 'HEAD')) &&
+			($clientETag === $serverETag)
+		) {
+			header('HTTP/1.1 304 Not Modified');
+			return true;
+		}
+
+		return false;
+	}
+
+	private function sendFile(string $path)
+	{
+		$mimeType = $this->mime->getType($path);
+		$sizeBytes = $this->data->getSizeBytes($path);
+
+		header("Content-Type: {$mimeType}");
+		header("Content-Length: {$sizeBytes}");
+		$this->data->send($path);
+
+		return true;
 	}
 }

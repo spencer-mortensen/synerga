@@ -27,13 +27,16 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 
-class DateCommand implements Command
+class JoinCommand implements Command
 {
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		$output = '';
 
-		return date($format, $timestamp);
+		for ($i = 0, $n = $arguments->count(); $i < $n; ++$i) {
+			$output .= $arguments->getString($i);
+		}
+
+		return $output;
 	}
 }

@@ -26,14 +26,27 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Authenticators\CookieAuthenticator;
+use Synerga\Variables;
 
-class DateCommand implements Command
+class CookieAuthenticateCommand implements Command
 {
+	private $cookieAuthenticator;
+	private $variables;
+
+	public function __construct(CookieAuthenticator $cookieAuthenticator, Variables $variables)
+	{
+		$this->cookieAuthenticator = $cookieAuthenticator;
+		$this->variables = $variables;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		if (!$this->cookieAuthenticator->authenticate($user)) {
+			return false;
+		}
 
-		return date($format, $timestamp);
+		$this->variables->set('user', $user);
+		return true;
 	}
 }

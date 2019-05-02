@@ -25,25 +25,61 @@
 
 namespace Synerga;
 
-use Synerga\Factories\SynergaFactory;
-
-class Synerga
+class Head
 {
-	/** @var Interpreter */
-	private $interpreter;
+	private $css;
+	private $js;
 
-	public function __construct(array $factories = null)
+	public function __construct()
 	{
-		if ($factories === null) {
-			$factories = [new SynergaFactory()];
-		}
-
-		$objects = new Objects($factories);
-		$this->interpreter = $objects->get('interpreter');
+		$this->css = [];
+		$this->js = [];
 	}
 
-	public function run($text)
+	public function getHtml(): string
 	{
-		return $this->interpreter->interpret($text);
+		$elements = [];
+
+		foreach ($this->css as $path) {
+			$elements[] = $this->getCssHtml($path);
+		}
+
+		foreach ($this->js as $path) {
+			$elements[] = $this->getJsHtml($path);
+		}
+
+		if (0 < count($elements)) {
+			return "\t" . implode("\n\t", $elements) . "\n";
+		}
+
+		return '';
+	}
+
+	public function addCssPath(string $path)
+	{
+		$this->css[$path] = $path;
+	}
+
+	public function addJsPath(string $path)
+	{
+		$this->js[$path] = $path;
+	}
+
+	private function getCssHtml(string $path): string
+	{
+		$pathHtml = Html5::attribute($path);
+
+		return <<<"EOS"
+<link href="{$pathHtml}" rel="stylesheet" type="text/css">
+EOS;
+	}
+
+	private function getJsHtml(string $path): string
+	{
+		$pathHtml = Html5::attribute($path);
+
+		return <<<"EOS"
+<script src="{$pathHtml}" type="text/css"></script>
+EOS;
 	}
 }

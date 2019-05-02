@@ -26,14 +26,23 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Head;
 
-class DateCommand implements Command
+class CssCommand implements Command
 {
+	private $head;
+
+	public function __construct(Head $head)
+	{
+		$this->head = $head;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		for ($i = 0, $n = $arguments->count(); $i < $n; ++$i) {
+			$path = $arguments->getString($i);
 
-		return date($format, $timestamp);
+			$this->head->addCssPath($path);
+		}
 	}
 }

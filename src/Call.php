@@ -23,17 +23,26 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+class Call
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+	private $name;
+	private $arguments;
 
-		return date($format, $timestamp);
+	public function __construct(string $name, array $arguments)
+	{
+		$this->name = $name;
+		$this->arguments = $arguments;
+	}
+
+	public function getName()
+	{
+		return $this->name;
+	}
+
+	public function getArguments()
+	{
+		return $this->arguments;
 	}
 }

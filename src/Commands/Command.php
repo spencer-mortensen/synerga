@@ -27,13 +27,7 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 
-class DateCommand implements Command
+interface Command
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
-
-		return date($format, $timestamp);
-	}
+	public function run(Arguments $arguments);
 }

@@ -23,25 +23,20 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-class Page
+use Synerga\Arguments;
+
+class OrCommand implements Command
 {
-	/** @var Scanner */
-	private $scanner;
-
-	/** @var Data */
-	private $data;
-
-	public function __construct(Scanner $scanner, Data $data)
+	public function run(Arguments $arguments)
 	{
-		$this->scanner = $scanner;
-		$this->data = $data;
-	}
+		for ($i = 0, $n = $arguments->count(); $i < $n; ++$i) {
+			if ($arguments->getBoolean($i)) {
+				return true;
+			}
+		}
 
-	public function send($path)
-	{
-		$text = $this->data->read($path);
-		echo $this->scanner->scan($text);
+		return false;
 	}
 }

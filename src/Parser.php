@@ -27,12 +27,12 @@ namespace Synerga;
 
 class Parser
 {
-	public function parse(StringInput $input, ParserCommand &$command = null)
+	public function parse(StringInput $input, Call &$call = null)
 	{
-		return $this->getCommand($input, $command);
+		return $this->getCall($input, $call);
 	}
 
-	private function getCommand(StringInput $input, &$command)
+	private function getCall(StringInput $input, &$call)
 	{
 		if (
 			$input->getLiteral('<:') &&
@@ -40,7 +40,7 @@ class Parser
 			$this->getArguments($input, $arguments) &&
 			$input->getRe('\\s*:>')
 		) {
-			$command = new ParserCommand($name, $arguments);
+			$call = new Call($name, $arguments);
 			return true;
 		}
 
@@ -53,7 +53,7 @@ class Parser
 
 		while (
 			$input->getRe('\\s+') &&
-			$this->getArgument($input, $argument)
+			$this->getValue($input, $argument)
 		) {
 			$arguments[] = $argument;
 		}
@@ -61,18 +61,14 @@ class Parser
 		return true;
 	}
 
-	private function getArgument(StringInput $input, &$argument)
-	{
-		return $this->getValue($input, $argument) ||
-			$this->getCommand($input, $argument);
-	}
-
 	private function getValue(StringInput $input, &$value)
 	{
 		return $this->getNull($input, $value) ||
 			$this->getBoolean($input, $value) ||
 			$this->getNumber($input, $value) ||
-			$this->getString($input, $value);
+			$this->getString($input, $value) ||
+			$this->getObject($input, $value) ||
+			$this->getCall($input, $value);
 	}
 
 	private function getNull(StringInput $input, &$value)
@@ -118,5 +114,35 @@ class Parser
 		}
 
 		return false;
+	}
+
+	private function getObject(StringInput $input, &$value)
+	{
+		return $input->getRe("{\\s*") &&
+			$this->getMap($input, $value) &&
+			$input->getRe("\\s*}");
+	}
+
+	private function getMap(StringInput $input, &$map)
+	{
+		$map = [];
+
+		if ($this->getKeyValue($input, $key, $value)) {
+			do {
+				$map[$key] = $value;
+			} while (
+				$input->getRe('\\s*,\\s*') &&
+				$this->getKeyValue($input, $key, $value)
+			);
+		}
+
+		return true;
+	}
+
+	private function getKeyValue(StringInput $input, &$key, &$value)
+	{
+		return $this->getString($input, $key) &&
+			$input->getRe('\\s*:\\s*') &&
+			$this->getValue($input, $value);
 	}
 }

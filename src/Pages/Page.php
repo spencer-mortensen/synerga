@@ -23,17 +23,11 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\Pages;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+interface Page
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+	public function getHead(): array;
 
-		return date($format, $timestamp);
-	}
+	public function getBody(): string;
 }

@@ -25,15 +25,49 @@
 
 namespace Synerga\Commands;
 
+use Exception;
 use Synerga\Arguments;
+use Synerga\Call;
+use Synerga\Evaluator;
+use Synerga\Url;
 
-class DateCommand implements Command
+class ControllerCommand implements Command
 {
+	/** @var Url */
+	private $url;
+
+	public function __construct(Url $url, Evaluator $evaluator)
+	{
+		$this->url = $url;
+		$this->evaluator = $evaluator;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		$map = $arguments->getArray(0);
+		$path = $this->url->getPath();
 
-		return date($format, $timestamp);
+		if (!$this->getAction($map, $path, $action)) {
+			// TODO: improve exceptions
+			throw new Exception('No action found');
+		}
+
+		// TODO: evaluate calls in arrays?
+		if ($action instanceof Call) {
+			$action = $this->evaluator->evaluate($action);
+		}
+
+		return $action;
+	}
+
+	private function getAction(array $map, string $path, &$action)
+	{
+		foreach ($map as $expression => $action) {
+			if (preg_match("\x03{$expression}\x03XDs", $path) === 1) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

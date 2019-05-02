@@ -23,29 +23,22 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-class ParserCommand
+use Exception;
+use Synerga\Arguments;
+
+class IntegerCommand implements Command
 {
-	/** @var string */
-	private $name;
-
-	/** @var array */
-	private $arguments;
-
-	public function __construct($name, array $arguments)
+	public function run(Arguments $arguments)
 	{
-		$this->name = $name;
-		$this->arguments = $arguments;
-	}
+		$stringValue = $arguments->getString(0);
+		$integerValue = (int)$stringValue;
 
-	public function getName()
-	{
-		return $this->name;
-	}
+		if ((string)$integerValue !== $stringValue) {
+			throw new Exception('Unable to convert to an integer');
+		}
 
-	public function getArguments()
-	{
-		return $this->arguments;
+		return $integerValue;
 	}
 }

@@ -23,17 +23,24 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+class Variables
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+	private $values;
 
-		return date($format, $timestamp);
+	public function __construct()
+	{
+		$this->values = [];
+	}
+
+	public function get(string $name)
+	{
+		return $this->values[$name] ?? null;
+	}
+
+	public function set(string $name, $value)
+	{
+		$this->values[$name] = $value;
 	}
 }

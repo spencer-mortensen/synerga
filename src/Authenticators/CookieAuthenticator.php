@@ -23,17 +23,39 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\Authenticators;
 
-use Synerga\Arguments;
+use Synerga\Cookies;
+use Synerga\Sessions;
 
-class DateCommand implements Command
+class CookieAuthenticator implements Authenticator
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+	private $sessions;
+	private $cookies;
 
-		return date($format, $timestamp);
+	public function __construct(Sessions $sessions, Cookies $cookies)
+	{
+		$this->sessions = $sessions;
+		$this->cookies = $cookies;
+	}
+
+	public function authenticate(string &$user = null): bool
+	{
+		if (!$this->cookies->get('session', $id)) {
+			return false;
+		}
+
+		$id = (int)$id;
+
+		if (!$this->sessions->get($id, $user)) {
+			$this->cookies->unset('session');
+			return false;
+		}
+
+		// TODO
+		$life = 691200; // 8 days
+
+		$this->cookies->set('session', $id, $life);
+		return true;
 	}
 }

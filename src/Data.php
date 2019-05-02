@@ -39,13 +39,33 @@ class Data
 	public function read($path)
 	{
 		$filePath = $this->getFilePath($path);
-		$contents = @file_get_contents($filePath);
+
+		if (!is_file($filePath)) {
+			return null;
+		}
+
+		$contents = file_get_contents($filePath);
 
 		if (!is_string($contents)) {
-			$contents = null;
+			return null;
 		}
 
 		return $contents;
+	}
+
+	public function write($path, $contents)
+	{
+		$filePath = $this->getFilePath($path);
+
+		if (!file_exists($filePath)) {
+			$directoryPath = dirname($filePath);
+
+			if (!file_exists($directoryPath)) {
+				mkdir($directoryPath, 0777, true);
+			}
+		}
+
+		file_put_contents($filePath, $contents);
 	}
 
 	public function send($path)
@@ -61,11 +81,20 @@ class Data
 		return is_file($filePath);
 	}
 
+	public function getSizeBytes($path)
+	{
+		$filePath = $this->getFilePath($path);
+
+		// TODO: may return false (and generate an accompanying E_WARNING)
+
+		return filesize($filePath);
+	}
+
 	public function mtime($path)
 	{
 		$filePath = $this->getFilePath($path);
 
-		$mtime = @filemtime($filePath);
+		$mtime = filemtime($filePath);
 
 		if (!is_integer($mtime)) {
 			$mtime = null;

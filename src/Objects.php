@@ -25,7 +25,7 @@
 
 namespace Synerga;
 
-use ErrorException;
+use Exception;
 
 class Objects
 {
@@ -69,6 +69,6 @@ class Objects
 			}
 		}
 
-		throw new ErrorException("Unknown object: {$name}");
+		throw new Exception("Unknown object: {$name}");
 	}
 }

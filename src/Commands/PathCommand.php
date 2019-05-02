@@ -25,9 +25,10 @@
 
 namespace Synerga\Commands;
 
+use Synerga\Arguments;
 use Synerga\Url;
 
-class PathCommand
+class PathCommand implements Command
 {
 	/** @var Url */
 	private $url;
@@ -37,7 +38,7 @@ class PathCommand
 		$this->url = $url;
 	}
 
-	public function run()
+	public function run(Arguments $arguments)
 	{
 		return $this->url->getPath();
 	}

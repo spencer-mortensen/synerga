@@ -26,14 +26,22 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Data;
 
-class DateCommand implements Command
+class ExistsCommand implements Command
 {
+	/** @var Data */
+	private $data;
+
+	public function __construct(Data $data)
+	{
+		$this->data = $data;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		$path = $arguments->getString(0);
 
-		return date($format, $timestamp);
+		return $this->data->exists($path);
 	}
 }

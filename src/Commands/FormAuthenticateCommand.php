@@ -26,14 +26,27 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Authenticators\FormAuthenticator;
+use Synerga\Variables;
 
-class DateCommand implements Command
+class FormAuthenticateCommand implements Command
 {
+	private $formAuthenticator;
+	private $variables;
+
+	public function __construct(FormAuthenticator $formAuthenticator, Variables $variables)
+	{
+		$this->formAuthenticator = $formAuthenticator;
+		$this->variables = $variables;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		if (!$this->formAuthenticator->authenticate($user)) {
+			return false;
+		}
 
-		return date($format, $timestamp);
+		$this->variables->set('user', $user);
+		return true;
 	}
 }

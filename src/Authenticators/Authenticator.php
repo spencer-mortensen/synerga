@@ -23,17 +23,9 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\Authenticators;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+interface Authenticator
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
-
-		return date($format, $timestamp);
-	}
+	public function authenticate(string &$user = null): bool;
 }

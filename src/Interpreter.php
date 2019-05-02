@@ -25,7 +25,7 @@
 
 namespace Synerga;
 
-class Scanner
+class Interpreter
 {
 	/** @var Parser */
 	private $parser;
@@ -39,7 +39,7 @@ class Scanner
 		$this->evaluator = $evaluator;
 	}
 
-	public function scan(string $text): string
+	public function interpret(string $text): string
 	{
 		$input = new StringInput($text);
 
@@ -89,7 +89,7 @@ class Scanner
 	private function getCommand(StringInput $input, &$output): bool
 	{
 		if ($this->parser->parse($input, $command)) {
-			$output = $this->evaluator->run($command);
+			$output = $this->evaluator->evaluate($command);
 			return true;
 		}
 

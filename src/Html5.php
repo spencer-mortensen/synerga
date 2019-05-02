@@ -23,17 +23,17 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+class Html5
 {
-	public function run(Arguments $arguments)
+	public static function text($text)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		return htmlspecialchars($text, ENT_HTML5 | ENT_DISALLOWED | ENT_NOQUOTES, 'UTF-8');
+	}
 
-		return date($format, $timestamp);
+	public static function attribute($value)
+	{
+		return htmlspecialchars($value, ENT_HTML5 | ENT_DISALLOWED | ENT_QUOTES, 'UTF-8');
 	}
 }

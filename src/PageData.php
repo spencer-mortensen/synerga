@@ -23,17 +23,25 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-
-class DateCommand implements Command
+class PageData
 {
-	public function run(Arguments $arguments)
-	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+	/** @var Interpreter */
+	private $interpreter;
 
-		return date($format, $timestamp);
+	/** @var Data */
+	private $data;
+
+	public function __construct(Interpreter $interpreter, Data $data)
+	{
+		$this->interpreter = $interpreter;
+		$this->data = $data;
+	}
+
+	public function send($path)
+	{
+		$text = $this->data->read($path);
+		echo $this->interpreter->interpret($text);
 	}
 }

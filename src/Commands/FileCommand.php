@@ -26,14 +26,22 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\File;
 
-class DateCommand implements Command
+class FileCommand implements Command
 {
+	/** @var File */
+	private $file;
+
+	public function __construct(File $file)
+	{
+		$this->file = $file;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$timestamp = $arguments->getInteger(0);
-		$format = $arguments->getString(1);
+		$path = $arguments->getString(0);
 
-		return date($format, $timestamp);
+		$this->file->send($path);
 	}
 }
