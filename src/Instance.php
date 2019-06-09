@@ -25,61 +25,26 @@
 
 namespace Synerga;
 
-class Head
+use Exception;
+
+class Instance
 {
-	private $css;
-	private $js;
+	private $parameters;
+	private $class;
 
-	public function __construct()
+	public function __construct(array $parameters, string $class)
 	{
-		$this->css = [];
-		$this->js = [];
+		$this->parameters = $parameters;
+		$this->class = $class;
 	}
 
-	public function getHtml(): string
+	public function getParameters(): array
 	{
-		$elements = [];
-
-		foreach ($this->css as $path) {
-			$elements[] = $this->getCssHtml($path);
-		}
-
-		foreach ($this->js as $path) {
-			$elements[] = $this->getJsHtml($path);
-		}
-
-		if (0 < count($elements)) {
-			return "\t" . implode("\n\t", $elements) . "\n";
-		}
-
-		return '';
+		return $this->parameters;
 	}
 
-	public function addCssPath(string $path)
+	public function getClass(): string
 	{
-		$this->css[$path] = $path;
-	}
-
-	public function addJsPath(string $path)
-	{
-		$this->js[$path] = $path;
-	}
-
-	private function getCssHtml(string $path): string
-	{
-		$pathHtml = Html5::attribute($path);
-
-		return <<<"EOS"
-<link href="{$pathHtml}" rel="stylesheet" type="text/css">
-EOS;
-	}
-
-	private function getJsHtml(string $path): string
-	{
-		$pathHtml = Html5::attribute($path);
-
-		return <<<"EOS"
-<script src="{$pathHtml}" type="text/css"></script>
-EOS;
+		return $this->class;
 	}
 }

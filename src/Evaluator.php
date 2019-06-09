@@ -28,11 +28,11 @@ namespace Synerga;
 class Evaluator
 {
 	/** @var array */
-	private $objects;
+	private $values;
 
-	public function __construct(Objects $objects)
+	public function __construct(Values $values)
 	{
-		$this->objects = $objects;
+		$this->values = $values;
 	}
 
 	public function evaluate(Call $call)
@@ -46,14 +46,12 @@ class Evaluator
 	{
 		$callName = $call->getName();
 		$commandName = $this->getCommandName($callName);
-		return $this->objects->get($commandName);
+		return $this->values->get($commandName);
 	}
 
 	private function getCommandName($name)
 	{
-		$words = explode('-', strtolower($name));
-		$words = array_map('ucfirst', $words);
-		return lcfirst(implode('', $words)) . 'Command';
+		return "command:{$name}";
 	}
 
 	private function getArguments(Call $call)

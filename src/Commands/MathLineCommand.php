@@ -23,25 +23,28 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-use Synerga\Factories\SynergaFactory;
+use Exception;
+use Synerga\Arguments;
+use Synerga\Page;
 
-class Synerga
+class MathLineCommand implements Command
 {
-	private $values;
+	private $mathjaxUrl;
 
-	public function __construct(array $settings)
+	public function __construct(Page $page, string $mathjaxUrl = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML')
 	{
-		$values = new Values($settings);
-		$values->set('values', $values);
-
-		$this->values = $values;
+		$this->page = $page;
+		$this->mathjaxUrl = $mathjaxUrl;
 	}
 
-	public function run($text)
+	public function run(Arguments $arguments): string
 	{
-		$interpreter = $this->values->get('interpreter');
-		return $interpreter->interpret($text);
+		$tex = $arguments->getString(0);
+
+		$this->page->addJs($this->mathjaxUrl);
+
+		return '$$' . $tex . '$$';
 	}
 }

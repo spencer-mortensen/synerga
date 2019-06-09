@@ -71,14 +71,15 @@ class Data
 	public function send($path)
 	{
 		$filePath = $this->getFilePath($path);
+
 		readfile($filePath);
 	}
 
 	public function exists($path)
 	{
-		$filePath = $this->getFilePath($path);
+		$directoryPath = "{$this->dataDirectory}/{$path}";
 
-		return is_file($filePath);
+		return is_dir($directoryPath);
 	}
 
 	public function getSizeBytes($path)

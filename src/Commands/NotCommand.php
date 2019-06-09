@@ -23,25 +23,14 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-class PageData
+use Synerga\Arguments;
+
+class NotCommand implements Command
 {
-	/** @var Interpreter */
-	private $interpreter;
-
-	/** @var Data */
-	private $data;
-
-	public function __construct(Interpreter $interpreter, Data $data)
+	public function run(Arguments $arguments)
 	{
-		$this->interpreter = $interpreter;
-		$this->data = $data;
-	}
-
-	public function send($path)
-	{
-		$text = $this->data->read($path);
-		echo $this->interpreter->interpret($text);
+		return !$arguments->getBoolean(0);
 	}
 }

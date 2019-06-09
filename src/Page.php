@@ -23,8 +23,60 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Factories;
+namespace Synerga;
 
-interface Factory
+class Page
 {
+	private $title;
+	private $css;
+	private $js;
+	private $html;
+
+	public function __construct()
+	{
+		$this->title = '';
+		$this->css = [];
+		$this->js = [];
+		$this->html = '';
+	}
+
+	public function setTitle(string $title)
+	{
+		$this->title = $title;
+	}
+
+	public function getTitle(): string
+	{
+		return $this->title;
+	}
+
+	public function addCss(string $url)
+	{
+		$this->css[$url] = $url;
+	}
+
+	public function getCss()
+	{
+		return $this->css;
+	}
+
+	public function addJs(string $url)
+	{
+		$this->js[$url] = $url;
+	}
+
+	public function getJs()
+	{
+		return $this->js;
+	}
+
+	public function setHtml(string $html)
+	{
+		$this->html = $html;
+	}
+
+	public function getHtml(): string
+	{
+		return $this->html;
+	}
 }

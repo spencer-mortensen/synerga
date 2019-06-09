@@ -44,7 +44,7 @@ class Url
 		return $this->path;
 	}
 
-	public function getUrl($path, $isAbsolute)
+	public function getUrl(string $path, bool $isAbsolute = null)
 	{
 		if ($this->baseUrl === null) {
 			return self::getRelativeUrl($this->path, $path);

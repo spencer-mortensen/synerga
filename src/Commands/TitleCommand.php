@@ -23,25 +23,22 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-use Synerga\Factories\SynergaFactory;
+use Synerga\Arguments;
+use Synerga\Page;
 
-class Synerga
+class TitleCommand implements Command
 {
-	private $values;
+	private $page;
 
-	public function __construct(array $settings)
+	public function __construct(Page $page)
 	{
-		$values = new Values($settings);
-		$values->set('values', $values);
-
-		$this->values = $values;
+		$this->page = $page;
 	}
 
-	public function run($text)
+	public function run(Arguments $arguments)
 	{
-		$interpreter = $this->values->get('interpreter');
-		return $interpreter->interpret($text);
+		return $this->page->getTitle();
 	}
 }

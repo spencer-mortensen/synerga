@@ -23,11 +23,28 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Pages;
+namespace Synerga\Commands;
 
-interface Page
+use Exception;
+use Synerga\Arguments;
+use Synerga\Page;
+
+class MathCommand implements Command
 {
-	public function getHead(): array;
+	private $mathjaxUrl;
 
-	public function getBody(): string;
+	public function __construct(Page $page, string $mathjaxUrl = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML')
+	{
+		$this->page = $page;
+		$this->mathjaxUrl = $mathjaxUrl;
+	}
+
+	public function run(Arguments $arguments): string
+	{
+		$tex = $arguments->getString(0);
+
+		$this->page->addJs($this->mathjaxUrl);
+
+		return "\\({$tex}\\)";
+	}
 }

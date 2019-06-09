@@ -26,23 +26,19 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Head;
+use Synerga\Page;
 
-class CssCommand implements Command
+class HtmlCommand implements Command
 {
-	private $head;
+	private $page;
 
-	public function __construct(Head $head)
+	public function __construct(Page $page)
 	{
-		$this->head = $head;
+		$this->page = $page;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		for ($i = 0, $n = $arguments->count(); $i < $n; ++$i) {
-			$path = $arguments->getString($i);
-
-			$this->head->addCssPath($path);
-		}
+		return $this->page->getHtml();
 	}
 }

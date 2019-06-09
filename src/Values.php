@@ -27,48 +27,63 @@ namespace Synerga;
 
 use Exception;
 
-class Objects
+class Values
 {
-	/** @var array */
-	private $factories;
+	private $settings;
+	private $values;
 
-	/** @var array */
-	private $objects;
-
-	public function __construct(array $factories)
+	public function __construct(array $settings)
 	{
-		$this->factories = $factories;
-		$this->objects = [];
+		$this->settings = $settings;
+		$this->values = [];
 	}
 
-	public function set($name, $object)
+	public function set($name, $value)
 	{
-		$this->objects[$name] = $object;
+		$this->values[$name] = $value;
 	}
 
 	public function get($name)
 	{
-		$object = &$this->objects[$name];
-
-		if ($object === null) {
-			$object = $this->instantiate($name);
+		if (!array_key_exists($name, $this->values)) {
+			$this->values[$name] = $this->instantiate($name);
 		}
 
-		return $object;
+		return $this->values[$name];
 	}
 
 	private function instantiate($name)
 	{
-		$method = 'new' . ucfirst($name);
-
-		foreach ($this->factories as $factory) {
-			$callable = [$factory, $method];
-
-			if (is_callable($callable)) {
-				return call_user_func($callable, $this);
-			}
+		if (!array_key_exists($name, $this->settings)) {
+			throw new Exception("Missing setting: {$name}");
 		}
 
-		throw new Exception("Unknown object: {$name}");
+		$setting = $this->settings[$name];
+
+		if ($setting instanceof Instance) {
+			return $this->getInstance($setting);
+		}
+
+		return $setting;
+	}
+
+	private function getInstance(Instance $instance)
+	{
+		$class = $instance->getClass();
+		$parameters = $instance->getParameters();
+		$arguments = $this->getArguments($parameters);
+
+		return new $class(...$arguments);
+	}
+
+	private function getArguments(array $parameters)
+	{
+		$arguments = [];
+
+		foreach ($parameters as $name) {
+			$arguments[] = $this->get($name);
+		}
+
+		return $arguments;
 	}
 }
