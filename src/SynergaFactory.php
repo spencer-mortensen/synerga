@@ -363,6 +363,6 @@ class SynergaFactory extends Factory
 
 	public function newVariables()
 	{
-		return new variables();
+		return new Variables();
 	}
 }
