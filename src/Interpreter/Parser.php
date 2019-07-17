@@ -23,7 +23,9 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Interpreter;
+
+use Synerga\Call;
 
 class Parser
 {

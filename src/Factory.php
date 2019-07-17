@@ -27,63 +27,38 @@ namespace Synerga;
 
 use Exception;
 
-class Values
+class Factory
 {
-	private $settings;
+	private $instructions;
 	private $values;
 
-	public function __construct(array $settings)
+	public function __construct(array &$instructions, array &$values)
 	{
-		$this->settings = $settings;
-		$this->values = [];
+		$this->instructions = &$instructions;
+		$this->values = &$values;
 	}
 
-	public function set($name, $value)
-	{
-		$this->values[$name] = $value;
-	}
-
-	public function get($name)
+	public function get(string $name)
 	{
 		if (!array_key_exists($name, $this->values)) {
-			$this->values[$name] = $this->instantiate($name);
+			$this->values[$name] = $this->new($name);
 		}
 
 		return $this->values[$name];
 	}
 
-	private function instantiate($name)
+	private function new(string $name)
 	{
-		if (!array_key_exists($name, $this->settings)) {
-			throw new Exception("Missing setting: {$name}");
+		if (!array_key_exists($name, $this->instructions)) {
+			throw new Exception("Missing instructions: {$name}");
 		}
 
-		$setting = $this->settings[$name];
+		$result = $this->instructions[$name];
 
-		if ($setting instanceof Instance) {
-			return $this->getInstance($setting);
+		if (is_callable($result)) {
+			return $result();
 		}
 
-		return $setting;
-	}
-
-	private function getInstance(Instance $instance)
-	{
-		$class = $instance->getClass();
-		$parameters = $instance->getParameters();
-		$arguments = $this->getArguments($parameters);
-
-		return new $class(...$arguments);
-	}
-
-	private function getArguments(array $parameters)
-	{
-		$arguments = [];
-
-		foreach ($parameters as $name) {
-			$arguments[] = $this->get($name);
-		}
-
-		return $arguments;
+		return $result;
 	}
 }

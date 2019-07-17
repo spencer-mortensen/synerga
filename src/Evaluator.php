@@ -30,7 +30,7 @@ class Evaluator
 	/** @var array */
 	private $values;
 
-	public function __construct(Values $values)
+	public function __construct(Factory $values)
 	{
 		$this->values = $values;
 	}

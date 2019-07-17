@@ -25,6 +25,9 @@
 
 namespace Synerga;
 
+use Synerga\Interpreter\Parser;
+use Synerga\Interpreter\StringInput;
+
 class Interpreter
 {
 	/** @var Parser */
