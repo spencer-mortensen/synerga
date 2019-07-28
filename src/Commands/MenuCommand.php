@@ -69,13 +69,8 @@ class MenuCommand implements Command
 		}
 
 		$url = $this->url->getUrl($path);
+		$urlHtml = Html5::getAttribute($url);
 
-		$attributes = [
-			'href' => $url
-		];
-
-		$attributesHtml = Html5::getAttributes($attributes);
-
-		return "<li><a{$attributesHtml}>{$textHtml}</a></li>";
+		return "<li><a href=\"{$urlHtml}\">{$textHtml}</a></li>";
 	}
 }
