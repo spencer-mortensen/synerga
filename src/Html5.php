@@ -37,7 +37,7 @@ class Html5
 		return htmlspecialchars($value, ENT_HTML5 | ENT_QUOTES | ENT_DISALLOWED, 'UTF-8');
 	}
 
-	public function getAttributes(array $attributes): string
+	public static function getAttributes(array $attributes): string
 	{
 		$html = '';
 
