@@ -27,13 +27,29 @@ namespace Synerga;
 
 class Html5
 {
-	public static function text($text)
+	public static function getText($text): string
 	{
-		return htmlspecialchars($text, ENT_HTML5 | ENT_DISALLOWED | ENT_NOQUOTES, 'UTF-8');
+		return htmlspecialchars($text, ENT_HTML5 | ENT_NOQUOTES | ENT_DISALLOWED, 'UTF-8');
 	}
 
-	public static function attribute($value)
+	public static function getAttribute($value): string
 	{
-		return htmlspecialchars($value, ENT_HTML5 | ENT_DISALLOWED | ENT_QUOTES, 'UTF-8');
+		return htmlspecialchars($value, ENT_HTML5 | ENT_QUOTES | ENT_DISALLOWED, 'UTF-8');
+	}
+
+	public function getAttributes(array $attributes): string
+	{
+		$html = '';
+
+		foreach ($attributes as $name => $value) {
+			if ($value === null) {
+				continue;
+			}
+
+			$valueHtml = htmlspecialchars($value, ENT_HTML5 | ENT_COMPAT | ENT_DISALLOWED, 'UTF-8');
+			$html .= " {$name}=\"{$valueHtml}\"";
+		}
+
+		return $html;
 	}
 }

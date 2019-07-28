@@ -62,15 +62,20 @@ class MenuCommand implements Command
 
 	private function getLiHtml(string $path, string $text, bool $isSelected): string
 	{
-		$textHtml = Html5::text($text);
+		$textHtml = Html5::getText($text);
 
 		if ($isSelected) {
 			return "<li class=\"here\"><a>{$textHtml}</a></li>";
 		}
 
 		$url = $this->url->getUrl($path);
-		$urlHtml = Html5::attribute($url);
 
-		return "<li><a href=\"{$urlHtml}\">{$textHtml}</a></li>";
+		$attributes = [
+			'href' => $url
+		];
+
+		$attributesHtml = Html5::getAttributes($attributes);
+
+		return "<li><a{$attributesHtml}>{$textHtml}</a></li>";
 	}
 }

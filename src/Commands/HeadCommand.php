@@ -62,7 +62,7 @@ class HeadCommand implements Command
 
 	private function getTitleHtml(string $value): string
 	{
-		$valueHtml = Html5::text($value);
+		$valueHtml = Html5::getText($value);
 
 		return "<title>{$valueHtml}</title>";
 	}
@@ -78,7 +78,7 @@ class HeadCommand implements Command
 
 	private function getCssHtml(string $url): string
 	{
-		$urlHtml = Html5::attribute($url);
+		$urlHtml = Html5::getAttribute($url);
 
 		return <<<"EOS"
 <link href="{$urlHtml}" rel="stylesheet" type="text/css">
@@ -96,7 +96,7 @@ EOS;
 
 	private function getJsHtml(string $url): string
 	{
-		$urlHtml = Html5::attribute($url);
+		$urlHtml = Html5::getAttribute($url);
 
 		return <<<"EOS"
 <script src="{$urlHtml}" type="text/javascript" defer></script>
