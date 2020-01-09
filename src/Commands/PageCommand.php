@@ -81,7 +81,7 @@ class PageCommand implements Command
 			return null;
 		}
 
-		$value = trim($this->interpreter->interpret($contents));
+		$value = $this->interpreter->interpret($contents);
 
 		if (strlen($value) === 0) {
 			return null;

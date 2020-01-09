@@ -23,34 +23,34 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\File;
+use Memcached;
 
-class FileCommand implements Command
+class Cache
 {
-	/** @var Data */
-	private $data;
+	private $memcached;
 
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
+	public function __construct(Memcached $memcached)
 	{
-		$this->data = $data;
-		$this->file = $file;
+		$this->memcached = $memcached;
 	}
 
-	public function run(Arguments $arguments)
+	public function get(string $name, &$value = null)
 	{
-		$path = $arguments->getString(0);
+		$value = $this->memcached->get($name);
 
-		if ($this->data->exists($path)) {
-			$this->file->send($path);
-		} else {
-			$arguments->getString(1);
+		if ($value !== false) {
+			return true;
 		}
+
+		$status = $this->memcached->getResultCode();
+
+		return ($status !== Memcached::RES_NOTFOUND);
+	}
+
+	public function set(string $name, $value)
+	{
+		$this->memcached->set($name, $value);
 	}
 }

@@ -25,8 +25,6 @@
 
 namespace Synerga;
 
-use SpencerMortensen\Filesystem\Path;
-
 class Sessions
 {
 	/** @var Data */
@@ -71,6 +69,7 @@ class Sessions
 
 		$sessions[$id] = $user;
 		$this->setSessions($sessions);
+
 		return true;
 	}
 
@@ -100,7 +99,7 @@ class Sessions
 		$json = $this->data->read($this->path);
 		$sessions = json_decode($json, true);
 
-		if ($sessions === null) {
+		if (!is_array($sessions)) {
 			$sessions = [];
 		}
 

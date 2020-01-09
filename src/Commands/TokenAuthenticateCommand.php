@@ -26,31 +26,27 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\File;
+use Synerga\Authenticators\TokenAuthenticator;
+use Synerga\Variables;
 
-class FileCommand implements Command
+class TokenAuthenticateCommand implements Command
 {
-	/** @var Data */
-	private $data;
+	private $tokenAuthenticator;
+	private $variables;
 
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
+	public function __construct(TokenAuthenticator $tokenAuthenticator, Variables $variables)
 	{
-		$this->data = $data;
-		$this->file = $file;
+		$this->tokenAuthenticator = $tokenAuthenticator;
+		$this->variables = $variables;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		$path = $arguments->getString(0);
-
-		if ($this->data->exists($path)) {
-			$this->file->send($path);
-		} else {
-			$arguments->getString(1);
+		if (!$this->tokenAuthenticator->authenticate($user)) {
+			return false;
 		}
+
+		$this->variables->set('user', $user);
+		return true;
 	}
 }

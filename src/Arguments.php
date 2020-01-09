@@ -47,7 +47,7 @@ class Arguments
 			throw new InvalidArgumentException("Missing argument {$i}");
 		}
 
-		$argument = &$this->arguments[$i];
+		$argument = $this->arguments[$i] ?? null;
 
 		if ($argument instanceof Call) {
 			$argument = $this->evaluator->evaluate($argument);
@@ -98,8 +98,10 @@ class Arguments
 		$argument = $this->getArgument($i);
 
 		if (!is_string($argument)) {
+			$argumentText = json_encode($argument);
+
 			// TODO:
-			throw new InvalidArgumentException("Argument {$i} is the wrong type, you know.");
+			throw new InvalidArgumentException("Argument {$i} should be a string, but turned out be: {$argumentText}.");
 		}
 
 		return $argument;

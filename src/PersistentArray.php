@@ -23,34 +23,68 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\File;
-
-class FileCommand implements Command
+class PersistentArray
 {
 	/** @var Data */
 	private $data;
 
-	/** @var File */
-	private $file;
+	/** @var string */
+	private $path;
 
-	public function __construct(Data $data, File $file)
+	/** @var null */
+	private $storedValue;
+
+	/** @var null */
+	private $activeValue;
+
+	public function __construct(Data $data, string $path)
 	{
 		$this->data = $data;
-		$this->file = $file;
+		$this->path = $path;
+		$this->storedValue = null;
+		$this->activeValue = null;
 	}
 
-	public function run(Arguments $arguments)
+	public function &link()
 	{
-		$path = $arguments->getString(0);
-
-		if ($this->data->exists($path)) {
-			$this->file->send($path);
-		} else {
-			$arguments->getString(1);
+		if ($this->storedValue === null) {
+			$this->activeValue = $this->readData();
+			$this->storedValue = $this->activeValue;
 		}
+
+		return $this->activeValue;
+	}
+
+	public function __destruct()
+	{
+		if ($this->storedValue !== $this->activeValue) {
+			$this->writeData($this->activeValue);
+		}
+	}
+
+	private function readData(): array
+	{
+		$contents = $this->data->read($this->path);
+
+		if ($contents === null) {
+			return [];
+		}
+
+		$value = json_decode($contents, true);
+
+		if (!is_array($value)) {
+			return [];
+		}
+
+		return $value;
+	}
+
+	public function writeData(array $value)
+	{
+		$contents = json_encode($value);
+
+		$this->data->write($this->path, $contents);
 	}
 }

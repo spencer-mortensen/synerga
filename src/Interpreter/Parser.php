@@ -29,18 +29,119 @@ use Synerga\Call;
 
 class Parser
 {
+	/** @var StringInput */
+	private $input;
+
 	public function parse(StringInput $input, Call &$call = null)
 	{
-		return $this->getCall($input, $call);
+		$this->input = $input;
+
+		return $this->getExpression($call);
 	}
 
-	private function getCall(StringInput $input, &$call)
+	private function getExpression(&$value)
+	{
+		return $this->getNull($value) ||
+			$this->getBoolean($value) ||
+			$this->getNumber($value) ||
+			$this->getString($value) ||
+			$this->getObject($value) ||
+			$this->getVariable($value) ||
+			$this->getCall($value);
+	}
+
+	private function getNull(&$value)
+	{
+		if ($this->input->getLiteral('null')) {
+			$value = null;
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getBoolean(&$value)
+	{
+		if ($this->input->getLiteral('false')) {
+			$value = false;
+			return true;
+		}
+
+		if ($this->input->getLiteral('true')) {
+			$value = true;
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getNumber(&$value)
+	{
+		if ($this->input->getRe('-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?', $json)) {
+			$value = json_decode($json, true);
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getString(&$value)
+	{
+		if ($this->input->getRe('"(?:[^\\x00-\\x1f"\\\\]|\\\\(?:["\\\\/bfnrt]|u[0-9a-f]{4}))*"', $json)) {
+			$value = json_decode($json, true);
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getObject(&$value)
+	{
+		return $this->input->getRe("{\\s*") &&
+			$this->getMap($value) &&
+			$this->input->getRe("\\s*}");
+	}
+
+	private function getMap(&$map)
+	{
+		$map = [];
+
+		if ($this->getKeyValue($key, $value)) {
+			do {
+				$map[$key] = $value;
+			} while (
+				$this->input->getRe('\\s*,\\s*') &&
+				$this->getKeyValue($key, $value)
+			);
+		}
+
+		return true;
+	}
+
+	private function getKeyValue(&$key, &$value)
+	{
+		return $this->getString($key) &&
+			$this->input->getRe('\\s*:\\s*') &&
+			$this->getExpression($value);
+	}
+
+	private function getVariable(&$call)
+	{
+		if ($this->input->getRe('[a-zA-Z0-9_-]+', $name)) {
+			$call = new Call($name, []);
+			return true;
+		}
+
+		return false;
+	}
+
+	private function getCall(&$call)
 	{
 		if (
-			$input->getLiteral('<:') &&
-			$input->getRe('[a-zA-Z0-9_-]+', $name) &&
-			$this->getArguments($input, $arguments) &&
-			$input->getRe('\\s*:>')
+			$this->input->getRe('\\s*\\(') &&
+			$this->input->getRe('[a-zA-Z0-9_-]+', $name) &&
+			$this->getArgumentList($arguments) &&
+			$this->input->getRe('\\s*\\)')
 		) {
 			$call = new Call($name, $arguments);
 			return true;
@@ -49,102 +150,17 @@ class Parser
 		return false;
 	}
 
-	private function getArguments(StringInput $input, &$arguments)
+	private function getArgumentList(&$arguments)
 	{
 		$arguments = [];
 
 		while (
-			$input->getRe('\\s+') &&
-			$this->getValue($input, $argument)
+			$this->input->getRe('\\s*') &&
+			$this->getExpression($argument)
 		) {
 			$arguments[] = $argument;
 		}
 
 		return true;
-	}
-
-	private function getValue(StringInput $input, &$value)
-	{
-		return $this->getNull($input, $value) ||
-			$this->getBoolean($input, $value) ||
-			$this->getNumber($input, $value) ||
-			$this->getString($input, $value) ||
-			$this->getObject($input, $value) ||
-			$this->getCall($input, $value);
-	}
-
-	private function getNull(StringInput $input, &$value)
-	{
-		if ($input->getLiteral('null')) {
-			$value = null;
-			return true;
-		}
-
-		return false;
-	}
-
-	private function getBoolean(StringInput $input, &$value)
-	{
-		if ($input->getLiteral('false')) {
-			$value = false;
-			return true;
-		}
-
-		if ($input->getLiteral('true')) {
-			$value = true;
-			return true;
-		}
-
-		return false;
-	}
-
-	private function getNumber(StringInput $input, &$value)
-	{
-		if ($input->getRe('-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?', $json)) {
-			$value = json_decode($json, true);
-			return true;
-		}
-
-		return false;
-	}
-
-	private function getString(StringInput $input, &$value)
-	{
-		if ($input->getRe('"(?:[^\\x00-\\x1f"\\\\]|\\\\(?:["\\\\/bfnrt]|u[0-9a-f]{4}))*"', $json)) {
-			$value = json_decode($json, true);
-			return true;
-		}
-
-		return false;
-	}
-
-	private function getObject(StringInput $input, &$value)
-	{
-		return $input->getRe("{\\s*") &&
-			$this->getMap($input, $value) &&
-			$input->getRe("\\s*}");
-	}
-
-	private function getMap(StringInput $input, &$map)
-	{
-		$map = [];
-
-		if ($this->getKeyValue($input, $key, $value)) {
-			do {
-				$map[$key] = $value;
-			} while (
-				$input->getRe('\\s*,\\s*') &&
-				$this->getKeyValue($input, $key, $value)
-			);
-		}
-
-		return true;
-	}
-
-	private function getKeyValue(StringInput $input, &$key, &$value)
-	{
-		return $this->getString($input, $key) &&
-			$input->getRe('\\s*:\\s*') &&
-			$this->getValue($input, $value);
 	}
 }

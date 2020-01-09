@@ -25,6 +25,7 @@
 
 namespace Synerga;
 
+use Exception;
 use Synerga\Interpreter\Parser;
 use Synerga\Interpreter\StringInput;
 
@@ -42,60 +43,51 @@ class Interpreter
 		$this->evaluator = $evaluator;
 	}
 
-	public function interpret(string $text): string
+	public function run(string $text): string
 	{
+		$text = ltrim($text);
+
 		$input = new StringInput($text);
 
-		$this->getOutput($input, $output);
-
-		return $output;
-	}
-
-	public function getOutput(StringInput $input, &$output): bool
-	{
-		$output = '';
-
-		while (
-			$this->getCommand($input, $text) ||
-			$this->getText($input, $text)
-		) {
-			$output .= $text;
-		}
-
-		return true;
-	}
-
-	private function getText(StringInput $input, &$output): bool
-	{
-		$text = $input->getInput();
-		$iBegin = $input->getPosition();
-
-		if (strlen($text) <= $iBegin) {
+		if (!$this->parser->parse($input, $command)) {
+			// TODO: error handling
 			return false;
 		}
 
-		$iEnd = strpos($text, '<:', $iBegin);
-
-		if ($iBegin === $iEnd) {
-			return false;
-		}
-
-		if (!is_int($iEnd)) {
-			$iEnd = strlen($text);
-		}
-
-		$output = substr($text, $iBegin, $iEnd - $iBegin);
-		$input->setPosition($iEnd);
-		return true;
+		return $this->evaluator->evaluate($command);
 	}
 
-	private function getCommand(StringInput $input, &$output): bool
+	public function interpret(string $input): string
 	{
-		if ($this->parser->parse($input, $command)) {
-			$output = $this->evaluator->evaluate($command);
-			return true;
+		$iBegin = 0;
+
+		ob_start();
+
+		while (true) {
+			$iEnd = strpos($input, '<:', $iBegin);
+
+			if ($iEnd === false) {
+				echo substr($input, $iBegin);
+				break;
+			}
+
+			echo substr($input, $iBegin, $iEnd - $iBegin);
+
+			$iBegin = $iEnd + 2;
+			$iEnd = strpos($input, ':>', $iBegin);
+
+			if ($iEnd === false) {
+				// TODO: error handling
+				throw new Exception("Missing ':>'");
+			}
+
+			$command = substr($input, $iBegin, $iEnd - $iBegin);
+			$command = ltrim($command);
+
+			echo $this->run($command);
+			$iBegin = $iEnd + 2;
 		}
 
-		return false;
+		return ob_get_clean();
 	}
 }

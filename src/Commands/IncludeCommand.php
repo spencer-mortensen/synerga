@@ -47,6 +47,7 @@ class IncludeCommand implements Command
 	{
 		$path = $arguments->getString(0);
 		$contents = $this->data->read($path);
-		return $this->interpreter->interpret($contents);
+		$contents = ltrim($contents);
+		return $this->interpreter->run($contents);
 	}
 }

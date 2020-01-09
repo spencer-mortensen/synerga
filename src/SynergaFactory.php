@@ -27,7 +27,7 @@ namespace Synerga;
 
 use Synerga\Authenticators\CookieAuthenticator;
 use Synerga\Authenticators\FormAuthenticator;
-use Synerga\Commands\ControllerCommand;
+use Synerga\Authenticators\TokenAuthenticator;
 use Synerga\Commands\CookieAuthenticateCommand;
 use Synerga\Commands\DateCommand;
 use Synerga\Commands\ExistsCommand;
@@ -41,6 +41,7 @@ use Synerga\Commands\IfCommand;
 use Synerga\Commands\IncludeCommand;
 use Synerga\Commands\IntegerCommand;
 use Synerga\Commands\JoinCommand;
+use Synerga\Commands\MatchCommand;
 use Synerga\Commands\MathCommand;
 use Synerga\Commands\MathLineCommand;
 use Synerga\Commands\MenuCommand;
@@ -50,6 +51,7 @@ use Synerga\Commands\PageCommand;
 use Synerga\Commands\PathCommand;
 use Synerga\Commands\SetCommand;
 use Synerga\Commands\TitleCommand;
+use Synerga\Commands\TokenAuthenticateCommand;
 use Synerga\Commands\UrlCommand;
 use Synerga\Interpreter\Parser;
 
@@ -58,30 +60,31 @@ class SynergaFactory extends Factory
 	public function getSettings()
 	{
 		return [
-			'command:controller' => [$this, 'newCommandController'],
-			'command:cookieAuthenticate' => [$this, 'newCommandCookieAuthenticate'],
-			'command:date' => [$this, 'newCommandDate'],
-			'command:exists' => [$this, 'newCommandExists'],
-			'command:file' => [$this, 'newCommandFile'],
-			'command:formAuthenticate' => [$this, 'newCommandFormAuthenticate'],
-			'command:get' => [$this, 'newCommandGet'],
-			'command:head' => [$this, 'newCommandHead'],
-			'command:html' => [$this, 'newCommandHtml'],
-			'command:http' => [$this, 'newCommandHttp'],
-			'command:if' => [$this, 'newCommandIf'],
-			'command:include' => [$this, 'newCommandInclude'],
-			'command:integer' => [$this, 'newCommandInteger'],
-			'command:join' => [$this, 'newCommandJoin'],
-			'command:math' => [$this, 'newCommandMath'],
-			'command:math-line' => [$this, 'newCommandMathLine'],
-			'command:menu' => [$this, 'newCommandMenu'],
-			'command:not' => [$this, 'newCommandNot'],
-			'command:or' => [$this, 'newCommandOr'],
-			'command:page' => [$this, 'newCommandPage'],
-			'command:path' => [$this, 'newCommandPath'],
-			'command:set' => [$this, 'newCommandSet'],
-			'command:title' => [$this, 'newCommandTitle'],
-			'command:url' => [$this, 'newCommandUrl'],
+			'command:cookieAuthenticate' => [$this, 'newCookieAuthenticateCommand'],
+			'command:date' => [$this, 'newDateCommand'],
+			'command:exists' => [$this, 'newExistsCommand'],
+			'command:file' => [$this, 'newFileCommand'],
+			'command:formAuthenticate' => [$this, 'newFormAuthenticateCommand'],
+			'command:get' => [$this, 'newGetCommand'],
+			'command:head' => [$this, 'newHeadCommand'],
+			'command:html' => [$this, 'newHtmlCommand'],
+			'command:http' => [$this, 'newHttpCommand'],
+			'command:if' => [$this, 'newIfCommand'],
+			'command:include' => [$this, 'newIncludeCommand'],
+			'command:integer' => [$this, 'newIntegerCommand'],
+			'command:join' => [$this, 'newJoinCommand'],
+			'command:match' => [$this, 'newMatchCommand'],
+			'command:math' => [$this, 'newMathCommand'],
+			'command:math-line' => [$this, 'newMathLineCommand'],
+			'command:menu' => [$this, 'newMenuCommand'],
+			'command:not' => [$this, 'newNotCommand'],
+			'command:or' => [$this, 'newOrCommand'],
+			'command:page' => [$this, 'newPageCommand'],
+			'command:path' => [$this, 'newPathCommand'],
+			'command:set' => [$this, 'newSetCommand'],
+			'command:title' => [$this, 'newTitleCommand'],
+			'command:tokenAuthenticate' => [$this, 'newTokenAuthenticateCommand'],
+			'command:url' => [$this, 'newUrlCommand'],
 			'cookieAuthenticator' => [$this, 'newCookieAuthenticator'],
 			'cookies' => [$this, 'newCookies'],
 			'cookies:options' => null,
@@ -94,6 +97,8 @@ class SynergaFactory extends Factory
 			'page' => [$this, 'newPage'],
 			'parser' => [$this, 'newParser'],
 			'sessions' => [$this, 'newSessions'],
+			'tokenAuthenticator' => [$this, 'newTokenAuthenticator'],
+			'tokens' => [$this, 'newTokens'],
 			'url' => [$this, 'newUrl'],
 			'users' => [$this, 'newUsers'],
 			'values' => $this,
@@ -101,15 +106,7 @@ class SynergaFactory extends Factory
 		];
 	}
 
-	public function newCommandController()
-	{
-		$url = $this->get('url');
-		$evaluator = $this->get('evaluator');
-
-		return new ControllerCommand($url, $evaluator);
-	}
-
-	public function newCommandCookieAuthenticate()
+	public function newCookieAuthenticateCommand()
 	{
 		$cookieAuthenticator = $this->get('cookieAuthenticator');
 		$variables = $this->get('variables');
@@ -117,150 +114,6 @@ class SynergaFactory extends Factory
 		return new CookieAuthenticateCommand($cookieAuthenticator, $variables);
 	}
 
-	public function newCommandDate()
-	{
-		return new DateCommand();
-	}
-
-	public function newCommandExists()
-	{
-		$data = $this->get('data');
-
-		return new ExistsCommand($data);
-	}
-
-	public function newCommandFile()
-	{
-		$file = $this->get('file');
-
-		return new FileCommand($file);
-	}
-
-	public function newCommandFormAuthenticate()
-	{
-		$formAuthenticator = $this->get('formAuthenticator');
-		$variables = $this->get('variables');
-
-		return new FormAuthenticateCommand($formAuthenticator, $variables);
-	}
-
-	public function newCommandGet()
-	{
-		$variables = $this->get('variables');
-
-		return new GetCommand($variables);
-	}
-	
-	public function newCommandHead()
-	{
-		$page = $this->get('page');
-
-		return new HeadCommand($page);
-	}
-	
-	public function newCommandHtml()
-	{
-		$page = $this->get('page');
-
-		return new HtmlCommand($page);
-	}
-	
-	public function newCommandHttp()
-	{
-		return new HttpCommand();
-	}
-	
-	public function newCommandIf()
-	{
-		return new IfCommand();
-	}
-	
-	public function newCommandInclude()
-	{
-		$data = $this->get('data');
-		$interpreter = $this->get('interpreter');
-
-		return new IncludeCommand($data, $interpreter);
-	}
-	
-	public function newCommandInteger()
-	{
-		return new IntegerCommand();
-	}
-	
-	public function newCommandJoin()
-	{
-		return new JoinCommand();
-	}
-	
-	public function newCommandMath()
-	{
-		$page = $this->get('page');
-
-		return new MathCommand($page);
-	}
-	
-	public function newCommandMathLine()
-	{
-		$page = $this->get('page');
-
-		return new MathLineCommand($page);
-	}
-	
-	public function newCommandMenu()
-	{
-		$url = $this->get('url');
-
-		return new MenuCommand($url);
-	}
-	
-	public function newCommandNot()
-	{
-		return new NotCommand();
-	}
-	
-	public function newCommandOr()
-	{
-		return new OrCommand();
-	}
-	
-	public function newCommandPage()
-	{
-		$data = $this->get('data');
-		$interpreter = $this->get('interpreter');
-		$page = $this->get('page');
-
-		return new PageCommand($data, $interpreter, $page);
-	}
-	
-	public function newCommandPath()
-	{
-		$url = $this->get('url');
-
-		return new PathCommand($url);
-	}
-	
-	public function newCommandSet()
-	{
-		$variables = $this->get('variables');
-
-		return new SetCommand($variables);
-	}
-	
-	public function newCommandTitle()
-	{
-		$page = $this->get('page');
-
-		return new TitleCommand($page);
-	}
-	
-	public function newCommandUrl()
-	{
-		$url = $this->get('url');
-
-		return new UrlCommand($url);
-	}
-	
 	public function newCookieAuthenticator()
 	{
 		$sessions = $this->get('sessions');
@@ -268,28 +121,40 @@ class SynergaFactory extends Factory
 
 		return new CookieAuthenticator($sessions, $cookies);
 	}
-	
+
 	public function newCookies()
 	{
 		$cookiesOptions = $this->get('cookies:options');
 
 		return new Cookies($cookiesOptions);
 	}
-	
+
 	public function newData()
 	{
 		$dataPath = $this->get('settings:data:path');
 
 		return new Data($dataPath);
 	}
-	
+
+	public function newDateCommand()
+	{
+		return new DateCommand();
+	}
+
 	public function newEvaluator()
 	{
 		$values = $this->get('values');
 
 		return new Evaluator($values);
 	}
-	
+
+	public function newExistsCommand()
+	{
+		$data = $this->get('data');
+
+		return new ExistsCommand($data);
+	}
+
 	public function newFile()
 	{
 		$data = $this->get('data');
@@ -297,7 +162,23 @@ class SynergaFactory extends Factory
 
 		return new File($data, $mime);
 	}
-	
+
+	public function newFileCommand()
+	{
+		$data = $this->get('data');
+		$file = $this->get('file');
+
+		return new FileCommand($data, $file);
+	}
+
+	public function newFormAuthenticateCommand()
+	{
+		$formAuthenticator = $this->get('formAuthenticator');
+		$variables = $this->get('variables');
+
+		return new FormAuthenticateCommand($formAuthenticator, $variables);
+	}
+
 	public function newFormAuthenticator()
 	{
 		$users = $this->get('users');
@@ -306,7 +187,51 @@ class SynergaFactory extends Factory
 
 		return new FormAuthenticator($users, $sessions, $cookies);
 	}
+
+	public function newGetCommand()
+	{
+		$variables = $this->get('variables');
+
+		return new GetCommand($variables);
+	}
 	
+	public function newHeadCommand()
+	{
+		$page = $this->get('page');
+
+		return new HeadCommand($page);
+	}
+	
+	public function newHtmlCommand()
+	{
+		$page = $this->get('page');
+
+		return new HtmlCommand($page);
+	}
+	
+	public function newHttpCommand()
+	{
+		return new HttpCommand();
+	}
+	
+	public function newIfCommand()
+	{
+		return new IfCommand();
+	}
+	
+	public function newIncludeCommand()
+	{
+		$data = $this->get('data');
+		$interpreter = $this->get('interpreter');
+
+		return new IncludeCommand($data, $interpreter);
+	}
+	
+	public function newIntegerCommand()
+	{
+		return new IntegerCommand();
+	}
+
 	public function newInterpreter()
 	{
 		$parser = $this->get('parser');
@@ -314,7 +239,38 @@ class SynergaFactory extends Factory
 
 		return new Interpreter($parser, $evaluator);
 	}
+
+	public function newJoinCommand()
+	{
+		return new JoinCommand();
+	}
+
+	public function newMatchCommand()
+	{
+		return new MatchCommand();
+	}
 	
+	public function newMathCommand()
+	{
+		$page = $this->get('page');
+
+		return new MathCommand($page);
+	}
+	
+	public function newMathLineCommand()
+	{
+		$page = $this->get('page');
+
+		return new MathLineCommand($page);
+	}
+	
+	public function newMenuCommand()
+	{
+		$url = $this->get('url');
+
+		return new MenuCommand($url);
+	}
+
 	public function newMime()
 	{
 		$data = $this->get('data');
@@ -322,23 +278,88 @@ class SynergaFactory extends Factory
 		return new Mime($data);
 	}
 	
+	public function newNotCommand()
+	{
+		return new NotCommand();
+	}
+	
+	public function newOrCommand()
+	{
+		return new OrCommand();
+	}
+
 	public function newPage()
 	{
 		return new Page();
 	}
 	
+	public function newPageCommand()
+	{
+		$data = $this->get('data');
+		$interpreter = $this->get('interpreter');
+		$page = $this->get('page');
+
+		return new PageCommand($data, $interpreter, $page);
+	}
+
 	public function newParser()
 	{
 		return new Parser();
 	}
 	
+	public function newPathCommand()
+	{
+		$url = $this->get('url');
+
+		return new PathCommand($url);
+	}
+
 	public function newSessions()
 	{
 		$data = $this->get('data');
 
 		return new Sessions($data);
 	}
+
+	public function newSetCommand()
+	{
+		$variables = $this->get('variables');
+
+		return new SetCommand($variables);
+	}
 	
+	public function newTitleCommand()
+	{
+		$page = $this->get('page');
+
+		return new TitleCommand($page);
+	}
+
+	public function newTokenAuthenticateCommand()
+	{
+		$tokenAuthenticator = $this->get('tokenAuthenticator');
+		$variables = $this->get('variables');
+
+		return new TokenAuthenticateCommand($tokenAuthenticator, $variables);
+	}
+
+	public function newTokenAuthenticator()
+	{
+		$tokens = $this->get('tokens');
+		$sessions = $this->get('sessions');
+		$cookies = $this->get('cookies');
+		$url = $this->get('url');
+
+		return new TokenAuthenticator($tokens, $sessions, $cookies, $url);
+	}
+
+	public function newTokens()
+	{
+		$data = $this->get('data');
+
+		return new Tokens($data);
+	}
+
 	public function newUrl()
 	{
 		$settings = $this->get('settings:url');
@@ -348,7 +369,14 @@ class SynergaFactory extends Factory
 
 		return new Url($urlBase, $urlPath);
 	}
-	
+
+	public function newUrlCommand()
+	{
+		$url = $this->get('url');
+
+		return new UrlCommand($url);
+	}
+
 	public function newUsers()
 	{
 		$data = $this->get('data');
