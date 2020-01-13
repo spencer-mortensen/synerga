@@ -42,6 +42,6 @@ class SetCommand implements Command
 		$name = $arguments->getString(0);
 		$value = $arguments->getArgument(1);
 
-		return $this->variables->set($name, $value);
+		$this->variables->set($name, $value);
 	}
 }

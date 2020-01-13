@@ -26,16 +26,42 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
+use Synerga\Variables;
 
 class MatchCommand implements Command
 {
+	private $variables;
+
+	public function __construct(Variables $variables)
+	{
+		$this->variables = $variables;
+	}
+
 	public function run(Arguments $arguments)
 	{
-		$expression = $arguments->getString(0);
-		$value = $arguments->getString(1);
+		$input = $arguments->getString(0);
+		$expression = $arguments->getString(1);
 
-		$pattern = "\x03{$expression}\x03XDs";
+		$pattern = self::getPattern($expression);
 
-		return preg_match($pattern, $value) === 1;
+		if (preg_match($pattern, $input, $match) !== 1) {
+			return false;
+		}
+
+		if (2 < $arguments->count()) {
+			$name = $arguments->getString(2);
+			$value = $match[1] ?? null;
+			$this->variables->set($name, $value);
+		}
+
+		return true;
+	}
+
+	private static function getPattern(string $expression)
+	{
+		$delimiter = "\x03";
+		$modifiers = 'XDs';
+
+		return $delimiter . $expression . $delimiter . $modifiers;
 	}
 }

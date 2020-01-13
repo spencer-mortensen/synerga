@@ -247,7 +247,9 @@ class SynergaFactory extends Factory
 
 	public function newMatchCommand()
 	{
-		return new MatchCommand();
+		$variables = $this->get('variables');
+
+		return new MatchCommand($variables);
 	}
 	
 	public function newMathCommand()
