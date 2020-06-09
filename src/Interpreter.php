@@ -46,7 +46,6 @@ class Interpreter
 	public function run(string $text): string
 	{
 		$text = ltrim($text);
-
 		$input = new StringInput($text);
 
 		if (!$this->parser->parse($input, $command)) {

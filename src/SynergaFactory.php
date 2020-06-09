@@ -49,6 +49,7 @@ use Synerga\Commands\NotCommand;
 use Synerga\Commands\OrCommand;
 use Synerga\Commands\PageCommand;
 use Synerga\Commands\PathCommand;
+use Synerga\Commands\ReadCommand;
 use Synerga\Commands\SetCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
@@ -81,6 +82,7 @@ class SynergaFactory extends Factory
 			'command:or' => [$this, 'newOrCommand'],
 			'command:page' => [$this, 'newPageCommand'],
 			'command:path' => [$this, 'newPathCommand'],
+			'command:read' => [$this, 'newReadCommand'],
 			'command:set' => [$this, 'newSetCommand'],
 			'command:title' => [$this, 'newTitleCommand'],
 			'command:tokenAuthenticate' => [$this, 'newTokenAuthenticateCommand'],
@@ -312,6 +314,14 @@ class SynergaFactory extends Factory
 		$url = $this->get('url');
 
 		return new PathCommand($url);
+	}
+
+	public function newReadCommand()
+	{
+		$data = $this->get('data');
+		$interpreter = $this->get('interpreter');
+
+		return new ReadCommand($data, $interpreter);
 	}
 
 	public function newSessions()
