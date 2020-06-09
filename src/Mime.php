@@ -27,55 +27,102 @@ namespace Synerga;
 
 class Mime
 {
-	/** @var Data */
-	private $data;
+	/** @var string */
+	private $defaultType;
 
-	public function __construct(Data $data)
+	/** @var array */
+	private $types;
+
+	public function __construct()
 	{
-		$this->data = $data;
+		$this->types = [
+			'7z' => 'application/x-7z-compressed',
+			'aac' => 'audio/aac',
+			'abw' => 'application/x-abiword',
+			'arc' => 'application/x-freearc',
+			'atom' => 'application/atom+xml',
+			'avi' => 'video/x-msvideo',
+			'azw' => 'application/vnd.amazon.ebook',
+			'bmp' => 'image/bmp',
+			'bz' => 'application/x-bzip',
+			'bz2' => 'application/x-bzip2',
+			'csh' => 'application/x-csh',
+			'css' => 'text/css',
+			'csv' => 'text/csv',
+			'divx' => 'video/divx',
+			'doc' => 'application/msword',
+			'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'eot' => 'application/vnd.ms-fontobject',
+			'epub' => 'application/epub+zip',
+			'gif' => 'image/gif',
+			'gz' => 'application/x-gzip',
+			'htm' => 'text/html',
+			'html' => 'text/html',
+			'ico' => 'image/x-icon',
+			'ics' => 'text/calendar',
+			'jar' => 'application/java-archive',
+			'jpeg' => 'image/jpeg',
+			'jpg' => 'image/jpeg',
+			'js' => 'text/javascript',
+			'json' => 'application/json',
+			'jsonld' => 'application/ld+json',
+			'mid' => 'audio/midi',
+			'midi' => 'audio/midi',
+			'mjs' => 'text/javascript',
+			'mp3' => 'audio/mpeg',
+			'mp4' => 'video/mp4',
+			'mpeg' => 'video/mpeg',
+			'mpg' => 'video/mpeg',
+			'odp' => 'application/vnd.oasis.opendocument.presentation',
+			'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
+			'odt' => 'application/vnd.oasis.opendocument.text',
+			'oga' => 'audio/ogg',
+			'ogg' => 'application/ogg',
+			'ogv' => 'video/ogg',
+			'ogx' => 'application/ogg',
+			'opus' => 'audio/opus',
+			'otf' => 'font/otf',
+			'pdf' => 'application/pdf',
+			'php' => 'application/x-httpd-php',
+			'png' => 'image/png',
+			'ppt' => 'application/vnd.ms-powerpoint',
+			'pptx' => 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+			'rar' => 'application/vnd.rar',
+			'rtf' => 'application/rtf',
+			'sfnt' => 'font/sfnt',
+			'svg' => 'image/svg+xml',
+			'swf' => 'application/x-shockwave-flash',
+			'tar' => 'application/x-tar',
+			'tif' => 'image/tiff',
+			'tiff' => 'image/tiff',
+			'ts' => 'video/mp2t',
+			'ttf' => 'font/ttf',
+			'txt' => 'text/plain',
+			'wav' => 'audio/x-wav',
+			'weba' => 'audio/webm',
+			'webm' => 'video/webm',
+			'webp' => 'image/webp',
+			'wmv' => 'video/x-ms-wmv',
+			'woff' => 'font/woff',
+			'woff2' => 'font/woff2',
+			'xhtml' => 'application/xhtml+xml',
+			'xls' => 'application/vnd.ms-excel',
+			'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'xml' => 'text/xml',
+			'zip' => 'application/zip'
+		];
+
+		$this->defaultType = 'application/octet-stream';
 	}
 
-	public function getType($path)
+	public function getType(string $extension)
 	{
-		$defaultMimeType = 'application/octet-stream';
-
-		$extension = self::getExtension($path);
-
-		$class = $this->getExtensionClass($extension);
-
-		if ($class === null) {
-			return $defaultMimeType;
-		}
-
-		$type = $this->getClassType($class);
-
-		if ($type === null) {
-			return $defaultMimeType;
-		}
-
-		return $type;
-	}
-
-	private static function getExtension($path)
-	{
-		$extension = pathinfo($path, PATHINFO_EXTENSION);
-
 		if (strlen($extension) === 0) {
-			return null;
+			return $this->defaultType;
 		}
 
-		return $extension;
-	}
+		$extension = strtolower($extension);
 
-	private function getExtensionClass($extension)
-	{
-		$path = ".config/mime/class/{$extension}";
-		return $this->data->read($path);
-	}
-
-	private function getClassType($class)
-	{
-		$path = ".config/mime/type/{$class}";
-		return $this->data->read($path);
+		return $this->types[$extension] ?? $this->defaultType;
 	}
 }

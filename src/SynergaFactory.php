@@ -275,9 +275,7 @@ class SynergaFactory extends Factory
 
 	public function newMime()
 	{
-		$data = $this->get('data');
-
-		return new Mime($data);
+		return new Mime();
 	}
 	
 	public function newNotCommand()

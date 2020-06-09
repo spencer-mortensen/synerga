@@ -23,40 +23,34 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga;
 
-use Exception;
-use Synerga\Arguments;
-
-class HttpCommand implements Command
+class Formatter
 {
-	public function run(Arguments $arguments)
+	private $map;
+
+	public function __construct()
 	{
-		$code = $arguments->getInteger(0);
-		$content = $arguments->getString(1);
-
-		if ($code === 200) {
-			$this->send('200 OK', $content);
-		} elseif ($code === 404) {
-			$this->send('400 Not Found', $content);
-		} else {
-			throw new Exception("Unknown code {$code}");
-		}
-
-		exit(0);
+		$this->map = [];
 	}
 
-	private function send(string $code, string $content = null)
+	public function set(string $name, string $line)
 	{
-		header("HTTP/1.1 {$code}");
+		$value = str_replace(array_keys($this->map), $this->map, $line);
 
-		if ($content === null) {
-			return;
-		}
+		$key = $this->key($name);
+		$this->map[$key] = $value;
+	}
 
-		$contentLength = strlen($content);
+	public function get(string $name): string
+	{
+		$key = $this->key($name);
 
-		header("Content-Length: {$contentLength}");
-		echo $content;
+		return $this->map[$key];
+	}
+
+	private function key(string $name)
+	{
+		return '{$' . $name . '}';
 	}
 }

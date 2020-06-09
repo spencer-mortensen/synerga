@@ -87,9 +87,11 @@ class File
 
 	private function sendFile(string $path)
 	{
-		$mimeType = $this->mime->getType($path);
+		$extension = pathinfo($path, PATHINFO_EXTENSION);
+		$mimeType = $this->mime->getType($extension);
 		$sizeBytes = $this->data->getSizeBytes($path);
 
+		header("HTTP/1.1 200 OK");
 		header("Content-Type: {$mimeType}");
 		header("Content-Length: {$sizeBytes}");
 		$this->data->send($path);
