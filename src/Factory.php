@@ -29,36 +29,34 @@ use Exception;
 
 class Factory
 {
-	private $instructions;
-	private $values;
+	private $settings;
+	private $objects;
 
-	public function __construct(array &$instructions, array &$values)
+	public function __construct(array $settings)
 	{
-		$this->instructions = &$instructions;
-		$this->values = &$values;
+		$this->settings = $settings;
+		$this->objects = [];
 	}
 
-	public function get(string $name)
+	public function __get(string $name)
 	{
-		if (!array_key_exists($name, $this->values)) {
-			$this->values[$name] = $this->new($name);
+		if (isset($this->$name)) {
+			return $this->$name;
 		}
 
-		return $this->values[$name];
-	}
+		$object = &$this->objects[$name];
 
-	private function new(string $name)
-	{
-		if (!array_key_exists($name, $this->instructions)) {
-			throw new Exception("Missing instructions: {$name}");
+		if ($object !== null) {
+			return $object;
 		}
 
-		$result = $this->instructions[$name];
+		$callable = [$this, 'new' . ucfirst($name)];
 
-		if (is_callable($result)) {
-			return $result();
+		if (is_callable($callable)) {
+			$object = call_user_func($callable);
+			return $object;
 		}
 
-		return $result;
+		throw new Exception("Missing instructions: {$name}");
 	}
 }

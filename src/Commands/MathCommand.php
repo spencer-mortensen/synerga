@@ -33,7 +33,7 @@ class MathCommand implements Command
 {
 	private $mathjaxUrl;
 
-	public function __construct(Page $page, string $mathjaxUrl = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS_CHTML')
+	public function __construct(Page $page, string $mathjaxUrl)
 	{
 		$this->page = $page;
 		$this->mathjaxUrl = $mathjaxUrl;

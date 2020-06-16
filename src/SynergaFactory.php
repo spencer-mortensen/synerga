@@ -58,348 +58,233 @@ use Synerga\Interpreter\Parser;
 
 class SynergaFactory extends Factory
 {
-	public function getSettings()
+	public function newCookieAuthenticateCommand(): CookieAuthenticateCommand
 	{
-		return [
-			'command:cookieAuthenticate' => [$this, 'newCookieAuthenticateCommand'],
-			'command:date' => [$this, 'newDateCommand'],
-			'command:exists' => [$this, 'newExistsCommand'],
-			'command:file' => [$this, 'newFileCommand'],
-			'command:formAuthenticate' => [$this, 'newFormAuthenticateCommand'],
-			'command:get' => [$this, 'newGetCommand'],
-			'command:head' => [$this, 'newHeadCommand'],
-			'command:html' => [$this, 'newHtmlCommand'],
-			'command:http' => [$this, 'newHttpCommand'],
-			'command:if' => [$this, 'newIfCommand'],
-			'command:include' => [$this, 'newIncludeCommand'],
-			'command:integer' => [$this, 'newIntegerCommand'],
-			'command:join' => [$this, 'newJoinCommand'],
-			'command:match' => [$this, 'newMatchCommand'],
-			'command:math' => [$this, 'newMathCommand'],
-			'command:math-line' => [$this, 'newMathLineCommand'],
-			'command:menu' => [$this, 'newMenuCommand'],
-			'command:not' => [$this, 'newNotCommand'],
-			'command:or' => [$this, 'newOrCommand'],
-			'command:page' => [$this, 'newPageCommand'],
-			'command:path' => [$this, 'newPathCommand'],
-			'command:read' => [$this, 'newReadCommand'],
-			'command:set' => [$this, 'newSetCommand'],
-			'command:title' => [$this, 'newTitleCommand'],
-			'command:tokenAuthenticate' => [$this, 'newTokenAuthenticateCommand'],
-			'command:url' => [$this, 'newUrlCommand'],
-			'cookieAuthenticator' => [$this, 'newCookieAuthenticator'],
-			'cookies' => [$this, 'newCookies'],
-			'cookies:options' => null,
-			'data' => [$this, 'newData'],
-			'evaluator' => [$this, 'newEvaluator'],
-			'file' => [$this, 'newFile'],
-			'formAuthenticator' => [$this, 'newFormAuthenticator'],
-			'interpreter' => [$this, 'newInterpreter'],
-			'mime' => [$this, 'newMime'],
-			'page' => [$this, 'newPage'],
-			'parser' => [$this, 'newParser'],
-			'sessions' => [$this, 'newSessions'],
-			'tokenAuthenticator' => [$this, 'newTokenAuthenticator'],
-			'tokens' => [$this, 'newTokens'],
-			'url' => [$this, 'newUrl'],
-			'users' => [$this, 'newUsers'],
-			'values' => $this,
-			'variables' => [$this, 'newVariables']
-		];
+		return new CookieAuthenticateCommand($this->cookieAuthenticator, $this->variables);
 	}
 
-	public function newCookieAuthenticateCommand()
+	public function newCookieAuthenticator(): CookieAuthenticator
 	{
-		$cookieAuthenticator = $this->get('cookieAuthenticator');
-		$variables = $this->get('variables');
-
-		return new CookieAuthenticateCommand($cookieAuthenticator, $variables);
+		return new CookieAuthenticator($this->sessions, $this->cookies);
 	}
 
-	public function newCookieAuthenticator()
+	public function newCookies(): Cookies
 	{
-		$sessions = $this->get('sessions');
-		$cookies = $this->get('cookies');
-
-		return new CookieAuthenticator($sessions, $cookies);
-	}
-
-	public function newCookies()
-	{
-		$cookiesOptions = $this->get('cookies:options');
+		$cookiesOptions = $this->settings['cookies']['options'] ?? null;
 
 		return new Cookies($cookiesOptions);
 	}
 
-	public function newData()
+	public function newData(): Data
 	{
-		$dataPath = $this->get('settings:data:path');
+		$dataPath = $this->settings['data'];
 
 		return new Data($dataPath);
 	}
 
-	public function newDateCommand()
+	public function newDateCommand(): DateCommand
 	{
 		return new DateCommand();
 	}
 
-	public function newEvaluator()
+	public function newEvaluator(): Evaluator
 	{
-		$values = $this->get('values');
-
-		return new Evaluator($values);
+		return new Evaluator($this);
 	}
 
-	public function newExistsCommand()
+	public function newExistsCommand(): ExistsCommand
 	{
-		$data = $this->get('data');
-
-		return new ExistsCommand($data);
+		return new ExistsCommand($this->data);
 	}
 
-	public function newFile()
+	public function newFile(): File
 	{
-		$data = $this->get('data');
-		$mime = $this->get('mime');
-
-		return new File($data, $mime);
+		return new File($this->data, $this->mime);
 	}
 
-	public function newFileCommand()
+	public function newFileCommand(): FileCommand
 	{
-		$data = $this->get('data');
-		$file = $this->get('file');
-
-		return new FileCommand($data, $file);
+		return new FileCommand($this->data, $this->file);
 	}
 
-	public function newFormAuthenticateCommand()
+	public function newFormAuthenticateCommand(): FormAuthenticateCommand
 	{
-		$formAuthenticator = $this->get('formAuthenticator');
-		$variables = $this->get('variables');
-
-		return new FormAuthenticateCommand($formAuthenticator, $variables);
+		return new FormAuthenticateCommand($this->formAuthenticator, $this->variables);
 	}
 
-	public function newFormAuthenticator()
+	public function newFormAuthenticator(): FormAuthenticator
 	{
-		$users = $this->get('users');
-		$sessions = $this->get('sessions');
-		$cookies = $this->get('cookies');
-
-		return new FormAuthenticator($users, $sessions, $cookies);
+		return new FormAuthenticator($this->users, $this->sessions, $this->cookies);
 	}
 
-	public function newGetCommand()
+	public function newGetCommand(): GetCommand
 	{
-		$variables = $this->get('variables');
-
-		return new GetCommand($variables);
+		return new GetCommand($this->variables);
 	}
 	
-	public function newHeadCommand()
+	public function newHeadCommand(): HeadCommand
 	{
-		$page = $this->get('page');
-
-		return new HeadCommand($page);
+		return new HeadCommand($this->page);
 	}
 	
-	public function newHtmlCommand()
+	public function newHtmlCommand(): HtmlCommand
 	{
-		$page = $this->get('page');
-
-		return new HtmlCommand($page);
+		return new HtmlCommand($this->page);
 	}
 	
-	public function newHttpCommand()
+	public function newHttpCommand(): HttpCommand
 	{
 		return new HttpCommand();
 	}
 	
-	public function newIfCommand()
+	public function newIfCommand(): IfCommand
 	{
 		return new IfCommand();
 	}
 	
-	public function newIncludeCommand()
+	public function newIncludeCommand(): IncludeCommand
 	{
-		$data = $this->get('data');
-		$interpreter = $this->get('interpreter');
-
-		return new IncludeCommand($data, $interpreter);
+		return new IncludeCommand($this->data, $this->interpreter);
 	}
 	
-	public function newIntegerCommand()
+	public function newIntegerCommand(): IntegerCommand
 	{
 		return new IntegerCommand();
 	}
 
-	public function newInterpreter()
+	public function newInterpreter(): Interpreter
 	{
-		$parser = $this->get('parser');
-		$evaluator = $this->get('evaluator');
-
-		return new Interpreter($parser, $evaluator);
+		return new Interpreter($this->parser, $this->evaluator);
 	}
 
-	public function newJoinCommand()
+	public function newJoinCommand(): JoinCommand
 	{
 		return new JoinCommand();
 	}
 
-	public function newMatchCommand()
+	public function newMatchCommand(): MatchCommand
 	{
-		$variables = $this->get('variables');
-
-		return new MatchCommand($variables);
+		return new MatchCommand($this->variables);
 	}
 	
-	public function newMathCommand()
+	public function newMathCommand(): MathCommand
 	{
-		$page = $this->get('page');
+		/*
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+		*/
 
-		return new MathCommand($page);
+		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
+
+		return new MathCommand($this->page, $mathjaxUrl);
+	}
+
+	public function newMathLineCommand(): MathLineCommand
+	{
+		/*
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+		*/
+
+		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
+
+		return new MathLineCommand($this->page, $mathjaxUrl);
 	}
 	
-	public function newMathLineCommand()
+	public function newMenuCommand(): MenuCommand
 	{
-		$page = $this->get('page');
-
-		return new MathLineCommand($page);
-	}
-	
-	public function newMenuCommand()
-	{
-		$url = $this->get('url');
-
-		return new MenuCommand($url);
+		return new MenuCommand($this->url);
 	}
 
-	public function newMime()
+	public function newMime(): Mime
 	{
 		return new Mime();
 	}
 	
-	public function newNotCommand()
+	public function newNotCommand(): NotCommand
 	{
 		return new NotCommand();
 	}
 	
-	public function newOrCommand()
+	public function newOrCommand(): OrCommand
 	{
 		return new OrCommand();
 	}
 
-	public function newPage()
+	public function newPage(): Page
 	{
 		return new Page();
 	}
 	
-	public function newPageCommand()
+	public function newPageCommand(): PageCommand
 	{
-		$data = $this->get('data');
-		$interpreter = $this->get('interpreter');
-		$page = $this->get('page');
-
-		return new PageCommand($data, $interpreter, $page);
+		return new PageCommand($this->data, $this->interpreter, $this->page);
 	}
 
-	public function newParser()
+	public function newParser(): Parser
 	{
 		return new Parser();
 	}
 	
-	public function newPathCommand()
+	public function newPathCommand(): PathCommand
 	{
-		$url = $this->get('url');
-
-		return new PathCommand($url);
+		return new PathCommand($this->url);
 	}
 
-	public function newReadCommand()
+	public function newReadCommand(): ReadCommand
 	{
-		$data = $this->get('data');
-		$interpreter = $this->get('interpreter');
-
-		return new ReadCommand($data, $interpreter);
+		return new ReadCommand($this->data, $this->interpreter);
 	}
 
-	public function newSessions()
+	public function newSessions(): Sessions
 	{
-		$data = $this->get('data');
-
-		return new Sessions($data);
+		return new Sessions($this->data);
 	}
 
-	public function newSetCommand()
+	public function newSetCommand(): SetCommand
 	{
-		$variables = $this->get('variables');
-
-		return new SetCommand($variables);
+		return new SetCommand($this->variables);
 	}
 	
-	public function newTitleCommand()
+	public function newTitleCommand(): TitleCommand
 	{
-		$page = $this->get('page');
-
-		return new TitleCommand($page);
+		return new TitleCommand($this->page);
 	}
 
-	public function newTokenAuthenticateCommand()
+	public function newTokenAuthenticateCommand(): TokenAuthenticateCommand
 	{
-		$tokenAuthenticator = $this->get('tokenAuthenticator');
-		$variables = $this->get('variables');
-
-		return new TokenAuthenticateCommand($tokenAuthenticator, $variables);
+		return new TokenAuthenticateCommand($this->tokenAuthenticator, $this->variables);
 	}
 
-	public function newTokenAuthenticator()
+	public function newTokenAuthenticator(): TokenAuthenticator
 	{
-		$tokens = $this->get('tokens');
-		$sessions = $this->get('sessions');
-		$cookies = $this->get('cookies');
-		$url = $this->get('url');
-
-		return new TokenAuthenticator($tokens, $sessions, $cookies, $url);
+		return new TokenAuthenticator($this->tokens, $this->sessions, $this->cookies, $this->url);
 	}
 
-	public function newTokens()
+	public function newTokens(): Tokens
 	{
-		$data = $this->get('data');
-
-		return new Tokens($data);
+		return new Tokens($this->data);
 	}
 
-	public function newUrl()
+	public function newUrl(): Url
 	{
-		$settings = $this->get('settings:url');
-
-		$urlBase = $settings['base'];
-		$urlPath = $settings['path'];
+		$urlBase = $this->settings['url']['base'];
+		$urlPath = $this->settings['url']['path'];
 
 		return new Url($urlBase, $urlPath);
 	}
 
-	public function newUrlCommand()
+	public function newUrlCommand(): UrlCommand
 	{
-		$url = $this->get('url');
-
-		return new UrlCommand($url);
+		return new UrlCommand($this->url);
 	}
 
-	public function newUsers()
+	public function newUsers(): Users
 	{
-		$data = $this->get('data');
-
-		return new Users($data);
+		return new Users($this->data);
 	}
 
-	public function newValues()
-	{
-		return $this;
-	}
-
-	public function newVariables()
+	public function newVariables(): Variables
 	{
 		return new Variables();
 	}
