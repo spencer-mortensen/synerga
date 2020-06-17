@@ -77,7 +77,8 @@ class Data
 
 	public function exists($path)
 	{
-		$directoryPath = "{$this->dataDirectory}/{$path}";
+		$filePath = $this->getFilePath($path);
+		$directoryPath = dirname($filePath);
 
 		return is_dir($directoryPath);
 	}
@@ -106,6 +107,6 @@ class Data
 
 	private function getFilePath($path)
 	{
-		return "{$this->dataDirectory}/{$path}/_";
+		return rtrim("{$this->dataDirectory}/{$path}", '/');
 	}
 }

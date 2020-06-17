@@ -1,0 +1,65 @@
+#!/usr/bin/env php
+<?php
+
+$directoryPath = '/home/username/project/data';
+
+$converter = new Converter();
+$converter->convertDirectory($directoryPath);
+
+class Converter
+{
+	public function convertDirectory(string $directoryPath)
+	{
+		$directory = opendir($directoryPath);
+
+		$hasDataFile = false;
+		$hasSiblings = false;
+
+		for ($childName = readdir($directory); $childName !== false; $childName = readdir($directory)) {
+			if (($childName === '.') || ($childName === '..')) {
+				continue;
+			}
+
+			$childPath = "{$directoryPath}/{$childName}";
+
+			if (is_dir($childPath)) {
+				$hasSiblings = true;
+
+				if ($childName === '_') {
+					echo "WARN: {$childPath} is a directory\n";
+				} else {
+					$this->convertDirectory($childPath);
+				}
+			} elseif (is_file($childPath)) {
+				if ($childName === '_') {
+					$hasDataFile = true;
+				} else {
+					$hasSiblings = true;
+					echo "NOTE: {$childPath} is already a file\n";
+				}
+			}
+		}
+
+		if ($hasDataFile) {
+			if ($hasSiblings) {
+				echo "ERROR: {$directoryPath}/_ has siblings\n";
+			} else {
+				$this->convertFile($directoryPath);
+			}
+		} else {
+			if (!$hasSiblings) {
+				echo "WARN: {$directoryPath} is an empty directory\n";
+			}
+		}
+	}
+
+	private function convertFile(string $parentPath)
+	{
+		$childPath = "{$parentPath}/_";
+		$tmpPath = '/tmp/_';
+
+		rename($childPath, $tmpPath);
+		rmdir($parentPath);
+		rename($tmpPath, $parentPath);
+	}
+}

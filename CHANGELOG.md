@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.25] - 2020-06-16
+- Edit the data directory path in the "bin/convert" script, then run it to convert your data directory:
+	All keys (e.g. ".title/_") have become files (e.g. ".title")
+
 ## [0.0.24] - 2020-06-16
 ### Changed
 - In your "*Factory" class, remove the "getSettings" method and extend "SynergaFactory" to include the Synerga commands
