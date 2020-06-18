@@ -25,6 +25,8 @@
 
 namespace Synerga;
 
+use SpencerMortensen\Exceptions\ErrorHandling;
+use SpencerMortensen\Logging\FileLogger;
 use Synerga\Authenticators\CookieAuthenticator;
 use Synerga\Authenticators\FormAuthenticator;
 use Synerga\Authenticators\TokenAuthenticator;
@@ -54,6 +56,7 @@ use Synerga\Commands\SetCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
 use Synerga\Commands\UrlCommand;
+use Synerga\ErrorHandling\ErrorHandler;
 use Synerga\Interpreter\Parser;
 
 class SynergaFactory extends Factory
@@ -85,6 +88,16 @@ class SynergaFactory extends Factory
 	public function newDateCommand(): DateCommand
 	{
 		return new DateCommand();
+	}
+
+	public function newErrorHandling(): ErrorHandling
+	{
+		$display = $this->settings['errors']['display'];
+		$logPath = $this->settings['errors']['log'];
+
+		$logger = new FileLogger($logPath);
+		$handler = new ErrorHandler($logger, $display);
+		return new ErrorHandling($handler, E_ALL);
 	}
 
 	public function newEvaluator(): Evaluator

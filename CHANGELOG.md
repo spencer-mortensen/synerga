@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.27] - 2020-06-17
+### Added
+ - In your "index.php" file, make these changes:
+	$settings = [
+		'data' => $dataDirectory,
+		'errors' => [
+			'display' => true,
+			'log' => $logDirectory . '/error.log'
+		],
+		'url' => [
+			'base' => $_SERVER['SYNERGA_BASE'],
+			'path' => $_SERVER['SYNERGA_PATH']
+		]
+	];
+
+	$synerga = new *Factory($settings);
+	$synerga->errorHandling;
+	$synerga->interpreter->interpret('<:(include ".config/boot/"):>');
+
 ## [0.0.26] - 2020-06-17
 ### Added
 - Added a new dependency, for future error handling
