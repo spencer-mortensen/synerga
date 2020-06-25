@@ -25,62 +25,60 @@
 
 namespace Synerga\Interpreter;
 
-class StringInput
+use Exception;
+
+class ParserException extends Exception
 {
 	/** @var string */
-	private $input;
+	private $text;
 
-	/** @var integer */
+	/** @var int */
 	private $position;
 
-	public function __construct(string $input = null, int $position = 0)
+	/** @var int */
+	private $expectation;
+
+	public function __construct(string $text, int $position, int $expectation)
 	{
-		$this->input = $input;
+		$message = $this->newMessage($text, $position, $expectation);
+		parent::__construct($message);
+
+		$this->text = $text;
 		$this->position = $position;
+		$this->expectation = $expectation;
 	}
 
-	public function getLiteral(string $string): bool
+	private function newMessage(string $text, int $position, int $expectation)
 	{
-		if (strlen($this->input) <= $this->position) {
-			return false;
+		switch ($expectation) {
+			default:
+				return 'Expected expression';
+
+			case Parser::NAME:
+				return 'Expected a name';
+
+			case Parser::RIGHT_PARENTHESIS:
+				return 'Expected ")"';
+
+			case Parser::KEY_VALUE:
+				return 'Expected a key/value pair';
+
+			case Parser::COLON:
+				return 'Expected ":"';
+
+			case Parser::RIGHT_BRACE:
+				return 'Expected ";"';
+
+			case Parser::END:
+				return 'Extra fluff found at the end';
 		}
 
-		$length = strlen($string);
-
-		if (substr_compare($this->input, $string, $this->position, $length) !== 0) {
-			return false;
-		}
-
-		$this->position += $length;
-		return true;
+		return 'hey';
 	}
 
-	public function getRe(string $expression, &$output = null): bool
+	public function getText(): string
 	{
-		$pattern = "\x03{$expression}\x03XADs";
-
-		if (preg_match($pattern, $this->input, $matches, 0, $this->position) !== 1) {
-			return false;
-		}
-
-		$output = (count($matches) === 1) ? $matches[0] : $matches;
-		$this->position += strlen($matches[0]);
-		return true;
-	}
-
-	public function getEnd(): bool
-	{
-		return $this->position === strlen($this->input);
-	}
-
-	public function getInput(): string
-	{
-		return $this->input;
-	}
-
-	public function setInput(string $input)
-	{
-		$this->input = $input;
+		return $this->text;
 	}
 
 	public function getPosition(): int
@@ -88,8 +86,8 @@ class StringInput
 		return $this->position;
 	}
 
-	public function setPosition(int $position)
+	public function getExpectation(): int
 	{
-		$this->position = $position;
+		return $this->expectation;
 	}
 }

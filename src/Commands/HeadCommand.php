@@ -99,7 +99,7 @@ EOS;
 		$urlHtml = Html5::getAttribute($url);
 
 		return <<<"EOS"
-<script src="{$urlHtml}" type="text/javascript" defer></script>
+<script src="{$urlHtml}" defer></script>
 EOS;
 	}
 }

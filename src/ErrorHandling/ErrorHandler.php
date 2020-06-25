@@ -6,6 +6,7 @@ use ErrorException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use SpencerMortensen\Exceptions\ErrorHandlerInterface;
+use Synerga\Exceptions\SynergaExceptionInterface;
 use Throwable;
 
 class ErrorHandler implements ErrorHandlerInterface

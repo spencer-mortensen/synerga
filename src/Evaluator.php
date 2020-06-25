@@ -25,6 +25,10 @@
 
 namespace Synerga;
 
+use Synerga\Exceptions\ArgumentException;
+use Synerga\Exceptions\CallException;
+use Throwable;
+
 class Evaluator
 {
 	/** @var array */
@@ -37,9 +41,14 @@ class Evaluator
 
 	public function evaluate(Call $call)
 	{
-		$command = $this->getCommand($call);
-		$arguments = $this->getArguments($call);
-		return $command->run($arguments);
+		try {
+			$command = $this->getCommand($call);
+			$arguments = $this->getArguments($call);
+			return $command->run($arguments);
+		} catch (ArgumentException $argumentException) {
+			$class = get_class($command);
+			throw new CallException($class, $argumentException);
+		}
 	}
 
 	private function getCommand(Call $call)

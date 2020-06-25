@@ -30,6 +30,7 @@ use SpencerMortensen\Logging\FileLogger;
 use Synerga\Authenticators\CookieAuthenticator;
 use Synerga\Authenticators\FormAuthenticator;
 use Synerga\Authenticators\TokenAuthenticator;
+use Synerga\Commands\BaseCommand;
 use Synerga\Commands\CookieAuthenticateCommand;
 use Synerga\Commands\DateCommand;
 use Synerga\Commands\ExistsCommand;
@@ -37,6 +38,7 @@ use Synerga\Commands\FileCommand;
 use Synerga\Commands\FormAuthenticateCommand;
 use Synerga\Commands\GetCommand;
 use Synerga\Commands\HeadCommand;
+use Synerga\Commands\HostCommand;
 use Synerga\Commands\HtmlCommand;
 use Synerga\Commands\HttpCommand;
 use Synerga\Commands\IfCommand;
@@ -52,15 +54,25 @@ use Synerga\Commands\OrCommand;
 use Synerga\Commands\PageCommand;
 use Synerga\Commands\PathCommand;
 use Synerga\Commands\ReadCommand;
+use Synerga\Commands\RedirectCommand;
+use Synerga\Commands\SchemeCommand;
 use Synerga\Commands\SetCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
 use Synerga\Commands\UrlCommand;
 use Synerga\ErrorHandling\ErrorHandler;
+use Synerga\Interpreter\Interpreter;
 use Synerga\Interpreter\Parser;
 
 class SynergaFactory extends Factory
 {
+	public function newBaseCommand(): BaseCommand
+	{
+		$base = $this->settings['url']['base'];
+
+		return new BaseCommand($base);
+	}
+
 	public function newCookieAuthenticateCommand(): CookieAuthenticateCommand
 	{
 		return new CookieAuthenticateCommand($this->cookieAuthenticator, $this->variables);
@@ -139,7 +151,14 @@ class SynergaFactory extends Factory
 	{
 		return new HeadCommand($this->page);
 	}
-	
+
+	public function newHostCommand(): HostCommand
+	{
+		$host = $this->settings['url']['host'];
+
+		return new HostCommand($host);
+	}
+
 	public function newHtmlCommand(): HtmlCommand
 	{
 		return new HtmlCommand($this->page);
@@ -249,9 +268,21 @@ class SynergaFactory extends Factory
 		return new ReadCommand($this->data, $this->interpreter);
 	}
 
+	public function newRedirectCommand(): RedirectCommand
+	{
+		return new RedirectCommand();
+	}
+
 	public function newSessions(): Sessions
 	{
 		return new Sessions($this->data);
+	}
+
+	public function newSchemeCommand(): SchemeCommand
+	{
+		$scheme = $this->settings['url']['scheme'];
+
+		return new SchemeCommand($scheme);
 	}
 
 	public function newSetCommand(): SetCommand

@@ -27,7 +27,7 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 use Synerga\Data;
-use Synerga\Interpreter;
+use Synerga\Interpreter\Interpreter;
 
 class IncludeCommand implements Command
 {

@@ -25,28 +25,23 @@
 
 namespace Synerga\Commands;
 
-use Exception;
 use Synerga\Arguments;
-use Synerga\Html5;
-use Synerga\Page;
 
-class MathLineCommand implements Command
+class RedirectCommand implements Command
 {
-	private $mathjaxUrl;
-
-	public function __construct(Page $page, string $mathjaxUrl)
+	public function run(Arguments $arguments)
 	{
-		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
-	}
+		$url = $arguments->getString(0);
+		$isPermanent = $arguments->getOptionalBoolean(1) ?? false;
 
-	public function run(Arguments $arguments): string
-	{
-		$this->page->addJs($this->mathjaxUrl);
+		if ($isPermanent) {
+			header("HTTP/1.1 301 Moved Permanently");
+			header("Location: {$url}");
+		} else {
+			header("HTTP/1.1 302 Found");
+			header("Location: {$url}");
+		}
 
-		$tex = $arguments->getString(0);
-		$texHtml = Html5::getText($tex);
-
-		return '$$' . $texHtml . '$$';
+		exit(0);
 	}
 }

@@ -23,11 +23,10 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Interpreter;
 
 use Exception;
-use Synerga\Interpreter\Parser;
-use Synerga\Interpreter\StringInput;
+use Synerga\Evaluator;
 
 class Interpreter
 {
@@ -43,16 +42,9 @@ class Interpreter
 		$this->evaluator = $evaluator;
 	}
 
-	public function run(string $text): string
+	public function run(string $code): string
 	{
-		$text = ltrim($text);
-		$input = new StringInput($text);
-
-		if (!$this->parser->parse($input, $command)) {
-			// TODO: error handling
-			return false;
-		}
-
+		$command = $this->parser->parse($code);
 		return $this->evaluator->evaluate($command);
 	}
 

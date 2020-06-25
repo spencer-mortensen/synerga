@@ -32,7 +32,7 @@ class Error500
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>Error</title>
 	<link href="https://fonts.googleapis.com/css2?family=Dosis:wght@500&display=swap" rel="stylesheet">
-	<style type="text/css">
+	<style>
 * {
 	margin: 0;
 	padding: 0;
@@ -82,12 +82,16 @@ p {
 dl {
 	display: block;
 	line-height: 1.5em;
+	padding-left: 3em;
+	position: relative;
 	text-align: left;
 	white-space: nowrap;
 }
 
 dt {
 	display: inline-block;
+	left: 0;
+	position: absolute;
 	text-align: right;
 	width: 3em;
 }
@@ -111,7 +115,7 @@ dd {
 <body>
 <h1><span class="type">Error</span> <span class="code">500</span></h1>
 
-<p>{$bodyHtml}</p>
+{$bodyHtml}
 </body>
 
 </html>

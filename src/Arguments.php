@@ -25,7 +25,7 @@
 
 namespace Synerga;
 
-use InvalidArgumentException;
+use Synerga\Exceptions\ArgumentException;
 
 class Arguments
 {
@@ -39,7 +39,6 @@ class Arguments
 	}
 
 	// TODO: check for the existence of an argument (without evaluating it)?
-	// TODO: get the number of arguments?
 
 	public function getArgument(int $i)
 	{
@@ -56,14 +55,17 @@ class Arguments
 		return $argument;
 	}
 
-	// TODO: catch this exception in the "Evaluator" class and add the command name...
+	public function count(): int
+	{
+		return count($this->arguments);
+	}
+
 	public function getBoolean(int $i): bool
 	{
 		$argument = $this->getArgument($i);
 
 		if (!is_bool($argument)) {
-			// TODO:
-			throw new InvalidArgumentException("Argument {$i} should be a boolean. FOOL!");
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_BOOLEAN);
 		}
 
 		return $argument;
@@ -74,8 +76,7 @@ class Arguments
 		$argument = $this->getArgument($i);
 
 		if (!is_int($argument)) {
-			// TODO:
-			throw new InvalidArgumentException("Argument {$i} should be an integer.");
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_INTEGER);
 		}
 
 		return $argument;
@@ -86,8 +87,7 @@ class Arguments
 		$argument = $this->getArgument($i);
 
 		if (!is_float($argument)) {
-			// TODO:
-			throw new InvalidArgumentException("Argument {$i} should float. At least, that's what the flight attendant said.");
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_FLOAT);
 		}
 
 		return $argument;
@@ -98,10 +98,7 @@ class Arguments
 		$argument = $this->getArgument($i);
 
 		if (!is_string($argument)) {
-			$argumentText = json_encode($argument);
-
-			// TODO:
-			throw new InvalidArgumentException("Argument {$i} should be a string, but turned out be: {$argumentText}.");
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_STRING);
 		}
 
 		return $argument;
@@ -112,15 +109,75 @@ class Arguments
 		$argument = $this->getArgument($i);
 
 		if (!is_array($argument)) {
-			// TODO:
-			throw new InvalidArgumentException("Argument {$i} ISN'T an array? WTF! I thought it was!");
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_ARRAY);
 		}
 
 		return $argument;
 	}
 
-	public function count(): int
+	public function getOptionalBoolean(int $i)
 	{
-		return count($this->arguments);
+		$argument = $this->getOptionalArgument($i);
+
+		if (($argument !== null) && !is_bool($argument)) {
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_BOOLEAN);
+		}
+
+		return $argument;
+	}
+
+	public function getOptionalInteger(int $i)
+	{
+		$argument = $this->getOptionalArgument($i);
+
+		if (($argument !== null) && !is_int($argument)) {
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_INTEGER);
+		}
+
+		return $argument;
+	}
+
+	public function getOptionalFloat(int $i)
+	{
+		$argument = $this->getOptionalArgument($i);
+
+		if (($argument !== null) && !is_float($argument)) {
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_FLOAT);
+		}
+
+		return $argument;
+	}
+
+	public function getOptionalString(int $i)
+	{
+		$argument = $this->getOptionalArgument($i);
+
+		if (($argument !== null) && !is_string($argument)) {
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_STRING);
+		}
+
+		return $argument;
+	}
+
+	public function getOptionalArray(int $i)
+	{
+		$argument = $this->getOptionalArgument($i);
+
+		if (($argument !== null) && !is_array($argument)) {
+			throw new ArgumentException($i, $argument, ArgumentException::TYPE_ARRAY);
+		}
+
+		return $argument;
+	}
+
+	public function getOptionalArgument(int $i)
+	{
+		$argument = $this->arguments[$i] ?? null;
+
+		if ($argument instanceof Call) {
+			$argument = $this->evaluator->evaluate($argument);
+		}
+
+		return $argument;
 	}
 }

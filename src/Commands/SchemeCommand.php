@@ -25,28 +25,19 @@
 
 namespace Synerga\Commands;
 
-use Exception;
 use Synerga\Arguments;
-use Synerga\Html5;
-use Synerga\Page;
 
-class MathLineCommand implements Command
+class SchemeCommand implements Command
 {
-	private $mathjaxUrl;
+	private $scheme;
 
-	public function __construct(Page $page, string $mathjaxUrl)
+	public function __construct(string $scheme)
 	{
-		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
+		$this->scheme = $scheme;
 	}
 
 	public function run(Arguments $arguments): string
 	{
-		$this->page->addJs($this->mathjaxUrl);
-
-		$tex = $arguments->getString(0);
-		$texHtml = Html5::getText($tex);
-
-		return '$$' . $texHtml . '$$';
+		return $this->scheme;
 	}
 }
