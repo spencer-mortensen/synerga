@@ -26,31 +26,39 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\File;
+use Synerga\Html5;
 
-class FileCommand implements Command
+class Html5NodeCommand implements Command
 {
-	/** @var Data */
-	private $data;
-
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
-	{
-		$this->data = $data;
-		$this->file = $file;
-	}
-
 	public function run(Arguments $arguments)
 	{
-		$path = $arguments->getString(0);
+		$name = $arguments->getOptionalString(0);
+		$attributes = $arguments->getOptionalArray(1);
+		$innerHtml = $arguments->getOptionalString(2);
 
-		if ($this->data->isFile($path)) {
-			$this->file->send($path);
-		} else {
-			$arguments->getString(1);
+		$attributesHtml = $this->getAttributesHtml($attributes);
+
+		return "<{$name}{$attributesHtml}>{$innerHtml}</{$name}>";
+	}
+
+	private function getAttributesHtml(array $attributes = null): string
+	{
+		if ($attributes === null) {
+			return '';
 		}
+
+		$html = '';
+
+		foreach ($attributes as $name => $value) {
+			if ($value === null) {
+				continue;
+			}
+
+			$valueHtml = Html5::getText($value);
+
+			$html .= " {$name}=\"{$valueHtml}\"";
+		}
+
+		return $html;
 	}
 }

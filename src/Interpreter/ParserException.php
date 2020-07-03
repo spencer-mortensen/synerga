@@ -72,8 +72,6 @@ class ParserException extends Exception
 			case Parser::END:
 				return 'Extra fluff found at the end';
 		}
-
-		return 'hey';
 	}
 
 	public function getText(): string

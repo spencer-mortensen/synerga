@@ -40,9 +40,8 @@ class UrlCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		$path = $arguments->getString(0);
-		$isAbsolute = 1 < $arguments->count() ? $arguments->getBoolean(1) : null;
-		// TODO: getOptionalBoolean?
+		$path = $arguments->getOptionalString(0);
+		$isAbsolute = $arguments->getOptionalBoolean(1);
 
 		return $this->url->getUrl($path, $isAbsolute);
 	}

@@ -47,12 +47,7 @@ class Arguments
 		}
 
 		$argument = $this->arguments[$i] ?? null;
-
-		if ($argument instanceof Call) {
-			$argument = $this->evaluator->evaluate($argument);
-		}
-
-		return $argument;
+		return $this->evaluator->evaluate($argument);
 	}
 
 	public function count(): int
@@ -173,11 +168,6 @@ class Arguments
 	public function getOptionalArgument(int $i)
 	{
 		$argument = $this->arguments[$i] ?? null;
-
-		if ($argument instanceof Call) {
-			$argument = $this->evaluator->evaluate($argument);
-		}
-
-		return $argument;
+		return $this->evaluator->evaluate($argument);
 	}
 }

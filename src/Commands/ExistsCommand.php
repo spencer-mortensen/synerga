@@ -42,6 +42,7 @@ class ExistsCommand implements Command
 	{
 		$path = $arguments->getString(0);
 
-		return $this->data->exists($path);
+		return $this->data->isDirectory($path)
+			|| $this->data->isFile($path);
 	}
 }

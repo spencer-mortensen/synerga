@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.29] - 2020-07-03
+### Added
+ - Added two new commands:
+	(equal $a $b)
+	(html5-node "a" {"href": $url} "link text")
+
 ## [0.0.28] - 2020-06-25
 ### Added
  - In your "index.php" file, add the "['url']['scheme']" and "['url']['host']" settings:
@@ -52,7 +58,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.0.24] - 2020-06-16
 ### Changed
-- In your "*Factory" class, remove the "getSettings" method and extend "SynergaFactory" to include the Synerga commands
+- In your "*Factory" class:
+	Extend "SynergaFactory" (to include the Synerga commands)
+	Remove the "getSettings" method (because this is now inferred)
+	Convert any "get" method calls to object properties. For example:
+		Before: $data = $this->get('data');
+		After: $this->data;
 - In your "index.php" file:
 	$settings = [
 		'data' => $dataDirectory,

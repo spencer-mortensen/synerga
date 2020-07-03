@@ -39,7 +39,20 @@ class Evaluator
 		$this->factory = $factory;
 	}
 
-	public function evaluate(Call $call)
+	public function evaluate($value)
+	{
+		if ($value instanceof Call) {
+			return $this->evaluateCall($value);
+		}
+
+		if (is_array($value)) {
+			return $this->evaluateArray($value);
+		}
+
+		return $value;
+	}
+
+	private function evaluateCall(Call $call)
 	{
 		try {
 			$command = $this->getCommand($call);
@@ -76,5 +89,16 @@ class Evaluator
 	{
 		$arguments = $call->getArguments();
 		return new Arguments($this, $arguments);
+	}
+
+	private function evaluateArray(array $array)
+	{
+		$result = [];
+
+		foreach ($array as $key => $value) {
+			$result[$key] = $this->evaluate($value);
+		}
+
+		return $result;
 	}
 }

@@ -30,15 +30,15 @@ class Data
 	/** @var string */
 	private $dataDirectory;
 
-	public function __construct($dataDirectory)
+	public function __construct(string $dataDirectory)
 	{
 		$this->dataDirectory = $dataDirectory;
 	}
 
 	// TODO: use the filesystem class
-	public function read($path)
+	public function read(string $path)
 	{
-		$filePath = $this->getFilePath($path);
+		$filePath = $this->getAbsolutePath($path);
 
 		if (!is_file($filePath)) {
 			return null;
@@ -53,9 +53,9 @@ class Data
 		return $contents;
 	}
 
-	public function write($path, $contents)
+	public function write(string $path, string $contents)
 	{
-		$filePath = $this->getFilePath($path);
+		$filePath = $this->getAbsolutePath($path);
 
 		if (!file_exists($filePath)) {
 			$directoryPath = dirname($filePath);
@@ -68,33 +68,57 @@ class Data
 		file_put_contents($filePath, $contents);
 	}
 
-	public function send($path)
+	public function send(string $path)
 	{
-		$filePath = $this->getFilePath($path);
+		$filePath = $this->getAbsolutePath($path);
 
 		readfile($filePath);
 	}
 
-	public function exists($path)
+	public function isDirectory(string $path): bool
 	{
-		$filePath = $this->getFilePath($path);
-		$directoryPath = dirname($filePath);
+		$filePath = $this->getAbsolutePath($path);
 
-		return is_dir($directoryPath);
+		return is_dir($filePath);
 	}
 
-	public function getSizeBytes($path)
+	public function isFile(string $path): bool
 	{
-		$filePath = $this->getFilePath($path);
+		$filePath = $this->getAbsolutePath($path);
+
+		return is_file($filePath);
+	}
+
+	public function getChildren(string $path): array
+	{
+		$directoryPath = rtrim("{$this->dataDirectory}/{$path}", '/');
+		$directory = opendir($directoryPath);
+
+		$children = [];
+
+		for ($child = readdir($directory); $child !== false; $child = readdir($directory)) {
+			if (($child === '.') || ($child === '..')) {
+				continue;
+			}
+
+			$children[] = $child;
+		}
+
+		return $children;
+	}
+
+	public function getSizeBytes(string $path)
+	{
+		$filePath = $this->getAbsolutePath($path);
 
 		// TODO: may return false (and generate an accompanying E_WARNING)
 
 		return filesize($filePath);
 	}
 
-	public function mtime($path)
+	public function mtime(string $path)
 	{
-		$filePath = $this->getFilePath($path);
+		$filePath = $this->getAbsolutePath($path);
 
 		$mtime = filemtime($filePath);
 
@@ -105,7 +129,7 @@ class Data
 		return $mtime;
 	}
 
-	private function getFilePath($path)
+	private function getAbsolutePath(string $path)
 	{
 		return rtrim("{$this->dataDirectory}/{$path}", '/');
 	}
