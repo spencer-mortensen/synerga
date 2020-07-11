@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.31] - 2020-07-10
+### Added
+ - No changes
+
 ## [0.0.30] - 2020-07-10
 ### Added
  - In your "index.php" file, add the "['errors']['level']" setting:
