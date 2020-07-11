@@ -43,7 +43,7 @@ class File
 
 	public function send(string $path)
 	{
-		$eTag = $this->getETag($path);
+		$eTag = $this->getServerETag($path);
 
 		$this->sendETagHeader($eTag);
 
@@ -53,7 +53,7 @@ class File
 		exit(0);
 	}
 
-	private function getETag(string $path)
+	private function getServerETag(string $path)
 	{
 		$mtime = $this->data->mtime($path);
 
@@ -64,6 +64,25 @@ class File
 		return base_convert($mtime, 10, 36);
 	}
 
+	private function getClientETag()
+	{
+		$eTag = $_SERVER['HTTP_IF_NONE_MATCH'] ?? null;
+
+		if ($eTag === null) {
+			return null;
+		}
+
+		$eTag = trim($eTag, '"');
+
+		$i = strpos($eTag, '-');
+
+		if ($i === false) {
+			return $eTag;
+		}
+
+		return substr($eTag, 0, $i);
+	}
+
 	private function sendETagHeader(string $eTag)
 	{
 		header("ETag: \"{$eTag}\"");
@@ -72,7 +91,7 @@ class File
 	private function sendUnmodifiedHeader(string $serverETag)
 	{
 		$method = $_SERVER['REQUEST_METHOD'];
-		$clientETag = isset($_SERVER['HTTP_IF_NONE_MATCH']) ? trim($_SERVER['HTTP_IF_NONE_MATCH'], ' "') : null;
+		$clientETag = $this->getClientETag();
 
 		if (
 			(($method === 'GET') || ($method === 'HEAD')) &&

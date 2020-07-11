@@ -106,12 +106,14 @@ class SynergaFactory extends Factory
 
 	public function newErrorHandling(): ErrorHandling
 	{
-		$display = $this->settings['errors']['display'];
-		$logPath = $this->settings['errors']['log'];
+		$errors = $this->settings['errors'];
+		$display = $errors['display'];
+		$level = $errors['level'];
+		$logPath = $errors['log'];
 
 		$logger = new FileLogger($logPath);
 		$handler = new ErrorHandler($logger, $display);
-		return new ErrorHandling($handler, E_ALL);
+		return new ErrorHandling($handler, $level);
 	}
 
 	public function newEvaluator(): Evaluator
