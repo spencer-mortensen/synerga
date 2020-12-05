@@ -51,6 +51,7 @@ use Synerga\Commands\MatchCommand;
 use Synerga\Commands\MathCommand;
 use Synerga\Commands\MathLineCommand;
 use Synerga\Commands\MenuCommand;
+use Synerga\Commands\MenuUpCommand;
 use Synerga\Commands\NotCommand;
 use Synerga\Commands\OrCommand;
 use Synerga\Commands\PageCommand;
@@ -240,6 +241,11 @@ class SynergaFactory extends Factory
 	public function newMenuCommand(): MenuCommand
 	{
 		return new MenuCommand($this->url);
+	}
+
+	public function newMenuUpCommand(): MenuUpCommand
+	{
+		return new MenuUpCommand($this->url, $this->data, $this->interpreter);
 	}
 
 	public function newMime(): Mime
