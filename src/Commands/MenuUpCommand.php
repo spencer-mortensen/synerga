@@ -47,7 +47,7 @@ class MenuUpCommand implements Command
 		$this->interpreter = $interpreter;
 	}
 
-	public function run(Arguments $arguments): string
+	public function run(Arguments $arguments)
 	{
 		$url = $this->getParentUrl();
 		$title = $this->getText("{$url}.page/.title/");

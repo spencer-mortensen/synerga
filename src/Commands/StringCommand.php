@@ -27,18 +27,16 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 
-class SchemeCommand implements Command
+class StringCommand implements Command
 {
-	/** @var string */
-	private $scheme;
-
-	public function __construct(string $scheme)
-	{
-		$this->scheme = $scheme;
-	}
-
 	public function run(Arguments $arguments)
 	{
-		return $this->scheme;
+		$value = $arguments->getArgument(0);
+
+		if (is_bool($value)) {
+			return $value ? 'true' : 'false';
+		}
+
+		return (string)$value;
 	}
 }

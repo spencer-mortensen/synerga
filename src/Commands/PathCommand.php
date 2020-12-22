@@ -26,20 +26,19 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Url;
 
 class PathCommand implements Command
 {
-	/** @var Url */
+	/** @var string */
 	private $url;
 
-	public function __construct(Url $url)
+	public function __construct(string $url)
 	{
 		$this->url = $url;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		return $this->url->getPath();
+		return $this->url;
 	}
 }

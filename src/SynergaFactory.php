@@ -30,7 +30,7 @@ use SpencerMortensen\Logging\FileLogger;
 use Synerga\Authenticators\CookieAuthenticator;
 use Synerga\Authenticators\FormAuthenticator;
 use Synerga\Authenticators\TokenAuthenticator;
-use Synerga\Commands\BaseCommand;
+use Synerga\Commands\AndCommand;
 use Synerga\Commands\CookieAuthenticateCommand;
 use Synerga\Commands\DateCommand;
 use Synerga\Commands\EqualCommand;
@@ -60,6 +60,8 @@ use Synerga\Commands\ReadCommand;
 use Synerga\Commands\RedirectCommand;
 use Synerga\Commands\SchemeCommand;
 use Synerga\Commands\SetCommand;
+use Synerga\Commands\SiteCommand;
+use Synerga\Commands\StringCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
 use Synerga\Commands\UrlCommand;
@@ -69,11 +71,9 @@ use Synerga\Interpreter\Parser;
 
 class SynergaFactory extends Factory
 {
-	public function newBaseCommand(): BaseCommand
+	public function newAndCommand(): AndCommand
 	{
-		$base = $this->settings['url']['base'];
-
-		return new BaseCommand($base);
+		return new AndCommand();
 	}
 
 	public function newCookieAuthenticateCommand(): CookieAuthenticateCommand
@@ -280,7 +280,9 @@ class SynergaFactory extends Factory
 	
 	public function newPathCommand(): PathCommand
 	{
-		return new PathCommand($this->url);
+		$page = $this->settings['url']['page'];
+
+		return new PathCommand($page);
 	}
 
 	public function newReadCommand(): ReadCommand
@@ -293,11 +295,6 @@ class SynergaFactory extends Factory
 		return new RedirectCommand();
 	}
 
-	public function newSessions(): Sessions
-	{
-		return new Sessions($this->data);
-	}
-
 	public function newSchemeCommand(): SchemeCommand
 	{
 		$scheme = $this->settings['url']['scheme'];
@@ -305,9 +302,26 @@ class SynergaFactory extends Factory
 		return new SchemeCommand($scheme);
 	}
 
+	public function newSessions(): Sessions
+	{
+		return new Sessions($this->data);
+	}
+
 	public function newSetCommand(): SetCommand
 	{
 		return new SetCommand($this->variables);
+	}
+
+	public function newSiteCommand(): SiteCommand
+	{
+		$site = $this->settings['url']['site'];
+
+		return new SiteCommand($site);
+	}
+
+	public function newStringCommand(): StringCommand
+	{
+		return new StringCommand();
 	}
 	
 	public function newTitleCommand(): TitleCommand
@@ -332,10 +346,10 @@ class SynergaFactory extends Factory
 
 	public function newUrl(): Url
 	{
-		$urlBase = $this->settings['url']['base'];
-		$urlPath = $this->settings['url']['path'];
+		$site = $this->settings['url']['site'];
+		$page = $this->settings['url']['page'];
 
-		return new Url($urlBase, $urlPath);
+		return new Url($site, $page);
 	}
 
 	public function newUrlCommand(): UrlCommand

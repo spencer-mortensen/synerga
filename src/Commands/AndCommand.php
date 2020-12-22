@@ -27,17 +27,16 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 
-class BaseCommand implements Command
+class AndCommand implements Command
 {
-	private $base;
-
-	public function __construct(string $base)
+	public function run(Arguments $arguments)
 	{
-		$this->base = $base;
-	}
+		for ($i = 0, $n = $arguments->count(); $i < $n; ++$i) {
+			if ($arguments->getBoolean($i) === false) {
+				return false;
+			}
+		}
 
-	public function run(Arguments $arguments): string
-	{
-		return $this->base;
+		return true;
 	}
 }

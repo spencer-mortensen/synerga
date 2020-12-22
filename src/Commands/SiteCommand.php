@@ -27,18 +27,18 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 
-class SchemeCommand implements Command
+class SiteCommand implements Command
 {
 	/** @var string */
-	private $scheme;
+	private $site;
 
-	public function __construct(string $scheme)
+	public function __construct(string $site)
 	{
-		$this->scheme = $scheme;
+		$this->site = $site;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		return $this->scheme;
+		return $this->site;
 	}
 }

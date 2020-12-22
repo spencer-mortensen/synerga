@@ -40,7 +40,7 @@ class MenuCommand implements Command
 		$this->url = $url;
 	}
 
-	public function run(Arguments $arguments): string
+	public function run(Arguments $arguments)
 	{
 		$map = $arguments->getArray(0);
 		$selectedPath = $this->url->getPath();

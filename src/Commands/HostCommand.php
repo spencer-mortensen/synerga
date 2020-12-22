@@ -29,6 +29,7 @@ use Synerga\Arguments;
 
 class HostCommand implements Command
 {
+	/** @var string */
 	private $host;
 
 	public function __construct(string $host)
@@ -36,7 +37,7 @@ class HostCommand implements Command
 		$this->host = $host;
 	}
 
-	public function run(Arguments $arguments): string
+	public function run(Arguments $arguments)
 	{
 		return $this->host;
 	}

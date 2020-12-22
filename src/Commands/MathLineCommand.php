@@ -40,7 +40,7 @@ class MathLineCommand implements Command
 		$this->mathjaxUrl = $mathjaxUrl;
 	}
 
-	public function run(Arguments $arguments): string
+	public function run(Arguments $arguments)
 	{
 		$this->page->addJs($this->mathjaxUrl);
 
