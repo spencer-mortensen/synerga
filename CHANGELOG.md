@@ -5,10 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.34] - 2021-01-05
+### Changed
+ - Renamed command: (html) => (body)
+ - Renamed file: ".page/.html" => ".page/.body"
+	You can convert your data directory like this:
+	cd data/ && find . -type f -print0 | xargs -0 rename 's/\/.html$/\/.body/'
+
 
 ## [0.0.33] - 2020-12-22
 ### Changed
- - Renamed one command: (base) => (site)
+ - Renamed command: (base) => (site)
 ### Added
  - Added two new commands:
 	(and {operand})

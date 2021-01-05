@@ -31,6 +31,7 @@ use Synerga\Authenticators\CookieAuthenticator;
 use Synerga\Authenticators\FormAuthenticator;
 use Synerga\Authenticators\TokenAuthenticator;
 use Synerga\Commands\AndCommand;
+use Synerga\Commands\BodyCommand;
 use Synerga\Commands\CookieAuthenticateCommand;
 use Synerga\Commands\DateCommand;
 use Synerga\Commands\EqualCommand;
@@ -40,7 +41,6 @@ use Synerga\Commands\FormAuthenticateCommand;
 use Synerga\Commands\GetCommand;
 use Synerga\Commands\HeadCommand;
 use Synerga\Commands\HostCommand;
-use Synerga\Commands\HtmlCommand;
 use Synerga\Commands\Html5NodeCommand;
 use Synerga\Commands\HttpCommand;
 use Synerga\Commands\IfCommand;
@@ -169,9 +169,9 @@ class SynergaFactory extends Factory
 		return new HostCommand($host);
 	}
 
-	public function newHtmlCommand(): HtmlCommand
+	public function newBodyCommand(): BodyCommand
 	{
-		return new HtmlCommand($this->page);
+		return new BodyCommand($this->page);
 	}
 
 	public function newHtml5NodeCommand(): Html5NodeCommand

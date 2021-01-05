@@ -59,7 +59,6 @@ class PageCommand implements Command
 		$this->addCss($path);
 		$this->addJs($path);
 		$this->setHtml($path);
-
 	}
 
 	private function setTitle(string $path)
@@ -129,7 +128,7 @@ class PageCommand implements Command
 
 	private function setHtml(string $path)
 	{
-		$html = $this->getString("{$path}.html/");
+		$html = $this->getString("{$path}.body/");
 
 		if ($html === null) {
 			return;

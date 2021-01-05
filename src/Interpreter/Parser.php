@@ -47,15 +47,15 @@ class Parser
 	/** @var int */
 	private $errorExpectation;
 
-	public function parse(string $text): Call
+	public function parse(string $text)
 	{
 		$this->input = new StringInput($text);
 
 		if (
-			$this->getExpression($call) &&
+			$this->getExpression($expression) &&
 			$this->getEnd()
 		) {
-			return $call;
+			return $expression;
 		}
 
 		throw new ParserException($text, $this->errorPosition, $this->errorExpectation);

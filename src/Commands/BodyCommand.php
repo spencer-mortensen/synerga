@@ -28,7 +28,7 @@ namespace Synerga\Commands;
 use Synerga\Arguments;
 use Synerga\Page;
 
-class HtmlCommand implements Command
+class BodyCommand implements Command
 {
 	private $page;
 
