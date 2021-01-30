@@ -25,31 +25,23 @@
 
 namespace Synerga\Commands;
 
-use Exception;
 use Synerga\Arguments;
 use Synerga\Html;
-use Synerga\Page;
 
-class MathLineCommand implements Command
+class HtmlCommand implements Command
 {
-	private $page;
-	private $mathjaxUrl;
+	/** @var Html */
 	private $html;
 
-	public function __construct(Page $page, string $mathjaxUrl, Html $html)
+	public function __construct(Html $html)
 	{
-		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
 		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		$this->page->addJs($this->mathjaxUrl);
+		$text = $arguments->getString(0);
 
-		$tex = $arguments->getString(0);
-		$texHtml = $this->html->encode($tex);
-
-		return '$$' . $texHtml . '$$';
+		return $this->html->encode($text);
 	}
 }

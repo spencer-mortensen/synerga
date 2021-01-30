@@ -28,7 +28,7 @@ namespace Synerga\Commands;
 use Exception;
 use Synerga\Arguments;
 use Synerga\Data;
-use Synerga\Html5;
+use Synerga\Html;
 use Synerga\Interpreter\Interpreter;
 use Synerga\Url;
 
@@ -40,11 +40,18 @@ class MenuUpCommand implements Command
 	/** @var Data */
 	private $data;
 
-	public function __construct(Url $url, Data $data, Interpreter $interpreter)
+	/** @var Interpreter */
+	private $interpreter;
+
+	/** @var Html */
+	private $html;
+
+	public function __construct(Url $url, Data $data, Interpreter $interpreter, Html $html)
 	{
 		$this->url = $url;
 		$this->data = $data;
 		$this->interpreter = $interpreter;
+		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
@@ -90,8 +97,8 @@ class MenuUpCommand implements Command
 	private function getAHtml(string $path, string $text): string
 	{
 		$url = $this->url->getUrl($path);
-		$urlHtml = Html5::getAttribute($url);
-		$textHtml = Html5::getText($text);
+		$urlHtml = $this->html->encode($url);
+		$textHtml = $this->html->encode($text);
 
 		return "<a href=\"{$urlHtml}\">{$textHtml}</a>";
 	}

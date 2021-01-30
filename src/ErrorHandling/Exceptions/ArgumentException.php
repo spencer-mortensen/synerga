@@ -1,10 +1,10 @@
 <?php
 
-namespace Synerga\Exceptions;
+namespace Synerga\ErrorHandling\Exceptions;
 
 use InvalidArgumentException;
 
-class ArgumentException extends InvalidArgumentException implements SynergaExceptionInterface
+class ArgumentException extends InvalidArgumentException
 {
 	const TYPE_NULL = 'null';
 	const TYPE_BOOLEAN = 'boolean';

@@ -26,10 +26,18 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Html5;
+use Synerga\Html;
 
 class Html5NodeCommand implements Command
 {
+	/** @var Html */
+	private $html;
+
+	public function __construct(Html $html)
+	{
+		$this->html = $html;
+	}
+
 	public function run(Arguments $arguments)
 	{
 		$name = $arguments->getOptionalString(0);
@@ -54,7 +62,7 @@ class Html5NodeCommand implements Command
 				continue;
 			}
 
-			$valueHtml = Html5::getText($value);
+			$valueHtml = $this->html->encode($value);
 
 			$html .= " {$name}=\"{$valueHtml}\"";
 		}

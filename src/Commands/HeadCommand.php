@@ -26,16 +26,21 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Html5;
+use Synerga\Html;
 use Synerga\Page;
 
 class HeadCommand implements Command
 {
+	/** @var Page */
 	private $page;
 
-	public function __construct(Page $page)
+	/** @var Html */
+	private $html;
+
+	public function __construct(Page $page, Html $html)
 	{
 		$this->page = $page;
+		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
@@ -62,7 +67,7 @@ class HeadCommand implements Command
 
 	private function getTitleHtml(string $value): string
 	{
-		$valueHtml = Html5::getText($value);
+		$valueHtml = $this->html->encode($value);
 
 		return "<title>{$valueHtml}</title>";
 	}
@@ -78,7 +83,7 @@ class HeadCommand implements Command
 
 	private function getCssHtml(string $url): string
 	{
-		$urlHtml = Html5::getAttribute($url);
+		$urlHtml = $this->html->encode($url);
 
 		return <<<"EOS"
 <link href="{$urlHtml}" rel="stylesheet" type="text/css">
@@ -96,7 +101,7 @@ EOS;
 
 	private function getJsHtml(string $url): string
 	{
-		$urlHtml = Html5::getAttribute($url);
+		$urlHtml = $this->html->encode($url);
 
 		return <<<"EOS"
 <script src="{$urlHtml}" defer></script>

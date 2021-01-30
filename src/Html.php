@@ -25,31 +25,44 @@
 
 namespace Synerga;
 
-class Html5
+use Exception;
+
+class Html
 {
-	public static function getText($text): string
+	/** @var int */
+	private $flags;
+
+	/** @var string */
+	private $encoding;
+
+	public function __construct(string $format)
 	{
-		return htmlspecialchars($text, ENT_HTML5 | ENT_NOQUOTES | ENT_DISALLOWED, 'UTF-8');
+		$this->flags = self::getFormatFlag($format);
+		$this->encoding = 'UTF-8';
 	}
 
-	public static function getAttribute($value): string
+	public function encode(string $text): string
 	{
-		return htmlspecialchars($value, ENT_HTML5 | ENT_QUOTES | ENT_DISALLOWED, 'UTF-8');
+		return htmlspecialchars($text, $this->flags | ENT_QUOTES, $this->encoding);
 	}
 
-	public static function getAttributes(array $attributes): string
+	private static function getFormatFlag(string $format): int
 	{
-		$html = '';
+		switch ($format) {
+			case 'HTML5':
+				return ENT_HTML5;
 
-		foreach ($attributes as $name => $value) {
-			if ($value === null) {
-				continue;
-			}
+			case 'HTML4':
+				return ENT_HTML401;
 
-			$valueHtml = htmlspecialchars($value, ENT_HTML5 | ENT_COMPAT | ENT_DISALLOWED, 'UTF-8');
-			$html .= " {$name}=\"{$valueHtml}\"";
+			case 'XHTML':
+				return ENT_XHTML;
+
+			case 'XML1':
+				return ENT_XML1;
+
+			default:
+				throw new Exception("Unrecognized doctype: {$format}");
 		}
-
-		return $html;
 	}
 }

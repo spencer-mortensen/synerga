@@ -25,8 +25,8 @@
 
 namespace Synerga;
 
-use Synerga\Exceptions\ArgumentException;
-use Synerga\Exceptions\CallException;
+use Synerga\ErrorHandling\Exceptions\ArgumentException;
+use Synerga\ErrorHandling\Exceptions\CallException;
 use Throwable;
 
 class Evaluator

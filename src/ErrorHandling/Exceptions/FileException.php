@@ -23,33 +23,34 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\ErrorHandling\Exceptions;
 
 use Exception;
-use Synerga\Arguments;
-use Synerga\Html;
-use Synerga\Page;
+use Synerga\ErrorHandling\Exceptions\EvaluationException;
 
-class MathLineCommand implements Command
+class FileException extends Exception
 {
-	private $page;
-	private $mathjaxUrl;
-	private $html;
+	/** @var string */
+	private $path;
 
-	public function __construct(Page $page, string $mathjaxUrl, Html $html)
+	/** @var EvaluationException */
+	private $exception;
+
+	public function __construct(string $path, EvaluationException $exception)
 	{
-		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
-		$this->html = $html;
+		parent::__construct();
+
+		$this->path = $path;
+		$this->exception = $exception;
 	}
 
-	public function run(Arguments $arguments)
+	public function getPath(): string
 	{
-		$this->page->addJs($this->mathjaxUrl);
+		return $this->path;
+	}
 
-		$tex = $arguments->getString(0);
-		$texHtml = $this->html->encode($tex);
-
-		return '$$' . $texHtml . '$$';
+	public function getException(): EvaluationException
+	{
+		return $this->exception;
 	}
 }

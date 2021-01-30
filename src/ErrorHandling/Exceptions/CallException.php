@@ -1,10 +1,10 @@
 <?php
 
-namespace Synerga\Exceptions;
+namespace Synerga\ErrorHandling\Exceptions;
 
 use Exception;
 
-class CallException extends Exception implements SynergaExceptionInterface
+class CallException extends Exception
 {
 	private $class;
 	private $argumentException;

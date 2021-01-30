@@ -33,13 +33,13 @@ class StringInput
 	/** @var integer */
 	private $position;
 
-	public function __construct(string $input = null, int $position = 0)
+	public function __construct(string $input = '', int $position = 0)
 	{
 		$this->input = $input;
 		$this->position = $position;
 	}
 
-	public function getLiteral(string $string): bool
+	public function readLiteral(string $string): bool
 	{
 		if (strlen($this->input) <= $this->position) {
 			return false;
@@ -55,7 +55,7 @@ class StringInput
 		return true;
 	}
 
-	public function getRe(string $expression, &$output = null): bool
+	public function readRe(string $expression, &$output = null): bool
 	{
 		$pattern = "\x03{$expression}\x03XADs";
 
@@ -68,7 +68,7 @@ class StringInput
 		return true;
 	}
 
-	public function getEnd(): bool
+	public function readEnd(): bool
 	{
 		return $this->position === strlen($this->input);
 	}

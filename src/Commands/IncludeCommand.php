@@ -25,6 +25,7 @@
 
 namespace Synerga\Commands;
 
+use Exception;
 use Synerga\Arguments;
 use Synerga\Data;
 use Synerga\Interpreter\Interpreter;
@@ -47,6 +48,12 @@ class IncludeCommand implements Command
 	{
 		$path = $arguments->getString(0);
 		$contents = $this->data->read($path);
+
+		if ($contents === null) {
+			$message = 'Missing file ' . var_export($path, true);
+			throw new Exception($message);
+		}
+
 		$contents = ltrim($contents);
 		return $this->interpreter->run($contents);
 	}

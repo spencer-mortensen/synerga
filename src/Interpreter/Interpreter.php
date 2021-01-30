@@ -27,6 +27,10 @@ namespace Synerga\Interpreter;
 
 use Exception;
 use Synerga\Evaluator;
+use Synerga\ErrorHandling\Exceptions\EvaluationException;
+use Synerga\ErrorHandling\Exceptions\FileException;
+use Synerga\ErrorHandling\Exceptions\ParserException;
+use Throwable;
 
 class Interpreter
 {
@@ -44,41 +48,95 @@ class Interpreter
 
 	public function run(string $code): string
 	{
-		$command = $this->parser->parse($code);
-		return $this->evaluator->evaluate($command);
+		$input = new StringInput($code);
+
+		if (!$this->parser->parse($input, $expression)) {
+			$code = $input->getInput();
+			$position = $this->parser->getErrorPosition();
+			$expectation = $this->parser->getErrorExpectation();
+
+			throw new ParserException($code, $position, $expectation);
+		}
+
+		$input->readRe("\\s*");
+
+		if (!$input->readEnd()) {
+			$code = $input->getInput();
+			$position = $input->getPosition();
+			$expectation = -1;
+
+			throw new ParserException($code, $position, $expectation);
+		}
+
+		return $this->evaluator->evaluate($expression);
 	}
 
-	public function interpret(string $input): string
+	public function interpret(string $text): string
 	{
+		$input = new StringInput($text);
+		$output = '';
+
 		$iBegin = 0;
 
-		ob_start();
-
 		while (true) {
-			$iEnd = strpos($input, '<:', $iBegin);
+			$iEnd = strpos($text, '<:', $iBegin);
 
 			if ($iEnd === false) {
-				echo substr($input, $iBegin);
+				$output .= substr($text, $iBegin);
 				break;
 			}
 
-			echo substr($input, $iBegin, $iEnd - $iBegin);
+			$output .= substr($text, $iBegin, $iEnd - $iBegin);
 
-			$iBegin = $iEnd + 2;
-			$iEnd = strpos($input, ':>', $iBegin);
+			$input->setPosition($iEnd + 2);
+			$input->readRe("\\s*");
 
-			if ($iEnd === false) {
-				// TODO: error handling
-				throw new Exception("Missing ':>'");
+			if (!$this->parser->parse($input, $expression)) {
+				$code = $input->getInput();
+				$position = $this->parser->getErrorPosition();
+				$expectation = $this->parser->getErrorExpectation();
+				$exception = new ParserException($expectation);
+
+				throw new EvaluationException($code, $position, $exception);
 			}
 
-			$command = substr($input, $iBegin, $iEnd - $iBegin);
-			$command = ltrim($command);
+			if (!$input->readRe("\\s*:>")) {
+				$code = $input->getInput();
+				$position = $input->getPosition();
+				$message = 'Missing “:>” tag';
+				$exception = new Exception($message);
 
-			echo $this->run($command);
-			$iBegin = $iEnd + 2;
+				throw new EvaluationException($code, $position, $exception);
+			}
+
+			try {
+				$result = $this->evaluator->evaluate($expression);
+			} catch (Throwable $throwable) {
+				if (
+					!($throwable instanceof FileException) &&
+					!($throwable instanceof EvaluationException)
+				) {
+					$code = $input->getInput();
+					$position = $input->getPosition();
+					$throwable =  new EvaluationException($code, $position, $throwable);
+				}
+
+				throw $throwable;
+			}
+
+			if (!is_string($result)) {
+				$code = $input->getInput();
+				$position = $input->getPosition();
+				$message = 'Expected a string value';
+				$exception = new Exception($message);
+
+				throw new EvaluationException($code, $position, $exception);
+			}
+
+			$output .= $result;
+			$iBegin = $input->getPosition();
 		}
 
-		return ob_get_clean();
+		return $output;
 	}
 }

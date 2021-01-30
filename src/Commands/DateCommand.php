@@ -33,7 +33,19 @@ class DateCommand implements Command
 	{
 		$timestamp = $arguments->getInteger(0);
 		$format = $arguments->getString(1);
+		$timeZone = $arguments->getOptionalString(2);
 
-		return date($format, $timestamp);
+		if ($timeZone === null) {
+			return date($format, $timestamp);
+		}
+
+		$defaultTimeZone = date_default_timezone_get();
+		date_default_timezone_set($timeZone);
+
+		$result = date($format, $timestamp);
+
+		date_default_timezone_set($defaultTimeZone);
+
+		return $result;
 	}
 }

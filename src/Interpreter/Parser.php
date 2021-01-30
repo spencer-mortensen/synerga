@@ -36,7 +36,6 @@ class Parser
 	const KEY_VALUE = 4;
 	const COLON = 5;
 	const RIGHT_BRACE = 6;
-	const END = 7;
 
 	/** @var StringInput */
 	private $input;
@@ -47,30 +46,25 @@ class Parser
 	/** @var int */
 	private $errorExpectation;
 
-	public function parse(string $text)
+	public function parse(StringInput $input, &$expression = null)
 	{
-		$this->input = new StringInput($text);
+		$this->input = $input;
+		$this->errorPosition = 0;
+		$this->errorExpectation = self::EXPRESSION;
 
-		if (
-			$this->getExpression($expression) &&
-			$this->getEnd()
-		) {
-			return $expression;
-		}
-
-		throw new ParserException($text, $this->errorPosition, $this->errorExpectation);
+		return $this->readExpression($expression);
 	}
 
-	private function getExpression(&$value): bool
+	private function readExpression(&$value): bool
 	{
 		if (
-			$this->getCall($value) ||
-			$this->getObject($value) ||
-			$this->getString($value) ||
-			$this->getNumber($value) ||
-			$this->getBoolean($value) ||
-			$this->getNull($value) ||
-			$this->getVariable($value)
+			$this->readCall($value) ||
+			$this->readObject($value) ||
+			$this->readString($value) ||
+			$this->readNumber($value) ||
+			$this->readBoolean($value) ||
+			$this->readNull($value) ||
+			$this->readVariable($value)
 		) {
 			return true;
 		}
@@ -78,15 +72,15 @@ class Parser
 		return $this->error(self::EXPRESSION);
 	}
 
-	private function getCall(&$call): bool
+	private function readCall(&$call): bool
 	{
 		$i = $this->input->getPosition();
 
 		if (
-			$this->getLeftParenthesis() &&
-			$this->getName($name) &&
-			$this->getArgumentList($arguments) &&
-			$this->getRightParenthesis()
+			$this->readLeftParenthesis() &&
+			$this->readName($name) &&
+			$this->readArgumentList($arguments) &&
+			$this->readRightParenthesis()
 		) {
 			$call = new Call($name, $arguments);
 			return true;
@@ -96,27 +90,27 @@ class Parser
 		return false;
 	}
 
-	private function getLeftParenthesis(): bool
+	private function readLeftParenthesis(): bool
 	{
-		return $this->input->getRe('\\s*\\(');
+		return $this->input->readRe('\\s*\\(');
 	}
 
-	private function getName(&$name): bool
+	private function readName(&$name): bool
 	{
-		if ($this->input->getRe('[a-zA-Z0-9_-]+', $name)) {
+		if ($this->input->readRe('[a-zA-Z0-9_-]+', $name)) {
 			return true;
 		}
 
 		return $this->error(self::NAME);
 	}
 
-	private function getArgumentList(&$arguments): bool
+	private function readArgumentList(&$arguments): bool
 	{
 		$arguments = [];
 
 		while (
-			$this->input->getRe('\\s*') &&
-			$this->getExpression($argument)
+			$this->input->readRe('\\s*') &&
+			$this->readExpression($argument)
 		) {
 			$arguments[] = $argument;
 		}
@@ -124,23 +118,23 @@ class Parser
 		return true;
 	}
 
-	private function getRightParenthesis(): bool
+	private function readRightParenthesis(): bool
 	{
-		if ($this->input->getRe('\\s*\\)')) {
+		if ($this->input->readRe('\\s*\\)')) {
 			return true;
 		}
 
 		return $this->error(self::RIGHT_PARENTHESIS);
 	}
 
-	private function getObject(&$value): bool
+	private function readObject(&$value): bool
 	{
 		$i = $this->input->getPosition();
 
 		if (
-			$this->getLeftBrace() &&
-			$this->getMap($value) &&
-			$this->getRightBrace()
+			$this->readLeftBrace() &&
+			$this->readMap($value) &&
+			$this->readRightBrace()
 		) {
 			return true;
 		}
@@ -149,35 +143,35 @@ class Parser
 		return false;
 	}
 
-	private function getLeftBrace(): bool
+	private function readLeftBrace(): bool
 	{
-		if ($this->input->getRe("{\\s*")) {
+		if ($this->input->readRe("{\\s*")) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private function getMap(&$map): bool
+	private function readMap(&$map): bool
 	{
 		$map = [];
 
-		if ($this->getKeyValue($key, $value)) {
+		if ($this->readKeyValue($key, $value)) {
 			do {
 				$map[$key] = $value;
-			} while ($this->getLink($key, $value));
+			} while ($this->readLink($key, $value));
 		}
 
 		return true;
 	}
 
-	private function getLink(&$key, &$value): bool
+	private function readLink(&$key, &$value): bool
 	{
 		$i = $this->input->getPosition();
 
 		if (
-			$this->getComma() &&
-			$this->getKeyValue($key, $value)
+			$this->readComma() &&
+			$this->readKeyValue($key, $value)
 		) {
 			return true;
 		}
@@ -186,23 +180,23 @@ class Parser
 		return false;
 	}
 
-	private function getComma(): bool
+	private function readComma(): bool
 	{
-		if ($this->input->getRe('\\s*,\\s*')) {
+		if ($this->input->readRe('\\s*,\\s*')) {
 			return true;
 		}
 
 		return false;
 	}
 
-	private function getKeyValue(&$key, &$value): bool
+	private function readKeyValue(&$key, &$value): bool
 	{
 		$i = $this->input->getPosition();
 
 		if (
-			$this->getString($key) &&
-			$this->getColon() &&
-			$this->getExpression($value)
+			$this->readString($key) &&
+			$this->readColon() &&
+			$this->readExpression($value)
 		) {
 			return true;
 		}
@@ -211,27 +205,27 @@ class Parser
 		return $this->error(self::KEY_VALUE);
 	}
 
-	private function getColon(): bool
+	private function readColon(): bool
 	{
-		if ($this->input->getRe('\\s*:\\s*')) {
+		if ($this->input->readRe('\\s*:\\s*')) {
 			return true;
 		}
 
 		return $this->error(self::COLON);
 	}
 
-	private function getRightBrace(): bool
+	private function readRightBrace(): bool
 	{
-		if ($this->input->getRe("\\s*}")) {
+		if ($this->input->readRe("\\s*}")) {
 			return true;
 		}
 
 		return $this->error(self::RIGHT_BRACE);
 	}
 
-	private function getString(&$value): bool
+	private function readString(&$value): bool
 	{
-		if ($this->input->getRe('"(?:[^\\x00-\\x1f"\\\\]|\\\\(?:["\\\\/bfnrt]|u[0-9a-f]{4}))*"', $json)) {
+		if ($this->input->readRe('"(?:[^\\x00-\\x1f"\\\\]|\\\\(?:["\\\\/bfnrt]|u[0-9a-f]{4}))*"', $json)) {
 			$value = json_decode($json, true);
 			return true;
 		}
@@ -239,9 +233,9 @@ class Parser
 		return false;
 	}
 
-	private function getNumber(&$value): bool
+	private function readNumber(&$value): bool
 	{
-		if ($this->input->getRe('-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?', $json)) {
+		if ($this->input->readRe('-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?', $json)) {
 			$value = json_decode($json, true);
 			return true;
 		}
@@ -249,14 +243,14 @@ class Parser
 		return false;
 	}
 
-	private function getBoolean(&$value): bool
+	private function readBoolean(&$value): bool
 	{
-		if ($this->input->getLiteral('false')) {
+		if ($this->input->readLiteral('false')) {
 			$value = false;
 			return true;
 		}
 
-		if ($this->input->getLiteral('true')) {
+		if ($this->input->readLiteral('true')) {
 			$value = true;
 			return true;
 		}
@@ -264,9 +258,9 @@ class Parser
 		return false;
 	}
 
-	private function getNull(&$value): bool
+	private function readNull(&$value): bool
 	{
-		if ($this->input->getLiteral('null')) {
+		if ($this->input->readLiteral('null')) {
 			$value = null;
 			return true;
 		}
@@ -274,26 +268,14 @@ class Parser
 		return false;
 	}
 
-	private function getVariable(&$call): bool
+	private function readVariable(&$call): bool
 	{
-		if ($this->getName($name)) {
+		if ($this->readName($name)) {
 			$call = new Call($name, []);
 			return true;
 		}
 
 		return false;
-	}
-
-	private function getEnd(): bool
-	{
-		if (
-			$this->input->getRe("\\s*") &&
-			$this->input->getEnd()
-		) {
-			return true;
-		}
-
-		return $this->error(self::END);
 	}
 
 	private function error(string $code): bool
@@ -306,5 +288,15 @@ class Parser
 		}
 
 		return false;
+	}
+
+	public function getErrorPosition(): int
+	{
+		return $this->errorPosition;
+	}
+
+	public function getErrorExpectation(): int
+	{
+		return $this->errorExpectation;
 	}
 }

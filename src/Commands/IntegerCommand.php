@@ -32,13 +32,13 @@ class IntegerCommand implements Command
 {
 	public function run(Arguments $arguments)
 	{
-		$stringValue = $arguments->getString(0);
-		$integerValue = (int)$stringValue;
+		$value = $arguments->getArgument(0);
+		$integer = (int)$value;
 
-		if ((string)$integerValue !== $stringValue) {
+		if (is_string($value) && ((string)$integer !== $value)) {
 			throw new Exception('Unable to convert to an integer');
 		}
 
-		return $integerValue;
+		return $integer;
 	}
 }

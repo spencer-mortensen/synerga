@@ -23,65 +23,49 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Interpreter;
+namespace Synerga\ErrorHandling\Exceptions;
 
 use Exception;
+use Synerga\Interpreter\Parser;
 
 class ParserException extends Exception
 {
-	/** @var string */
-	private $text;
-
-	/** @var int */
-	private $position;
-
 	/** @var int */
 	private $expectation;
 
-	public function __construct(string $text, int $position, int $expectation)
+	public function __construct(int $expectation)
 	{
-		$message = $this->newMessage($text, $position, $expectation);
+		$message = $this->newMessage($expectation);
+
 		parent::__construct($message);
 
-		$this->text = $text;
-		$this->position = $position;
 		$this->expectation = $expectation;
 	}
 
-	private function newMessage(string $text, int $position, int $expectation)
+	private function newMessage(int $expectation): string
 	{
 		switch ($expectation) {
-			default:
-				return 'Expected expression';
+			case Parser::EXPRESSION:
+				return 'Expected an expression';
 
 			case Parser::NAME:
 				return 'Expected a name';
 
 			case Parser::RIGHT_PARENTHESIS:
-				return 'Expected ")"';
+				return 'Missing “)”';
 
 			case Parser::KEY_VALUE:
 				return 'Expected a key/value pair';
 
 			case Parser::COLON:
-				return 'Expected ":"';
+				return 'Missing “:”';
 
 			case Parser::RIGHT_BRACE:
-				return 'Expected ";"';
+				return 'Missing “}”';
 
-			case Parser::END:
-				return 'Extra fluff found at the end';
+			default:
+				return '';
 		}
-	}
-
-	public function getText(): string
-	{
-		return $this->text;
-	}
-
-	public function getPosition(): int
-	{
-		return $this->position;
 	}
 
 	public function getExpectation(): int

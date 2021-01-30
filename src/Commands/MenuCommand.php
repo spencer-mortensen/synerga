@@ -27,7 +27,7 @@ namespace Synerga\Commands;
 
 use Exception;
 use Synerga\Arguments;
-use Synerga\Html5;
+use Synerga\Html;
 use Synerga\Url;
 
 class MenuCommand implements Command
@@ -35,9 +35,13 @@ class MenuCommand implements Command
 	/** @var Url */
 	private $url;
 
-	public function __construct(Url $url)
+	/** @var Html */
+	private $html;
+
+	public function __construct(Url $url, Html $html)
 	{
 		$this->url = $url;
+		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
@@ -62,14 +66,14 @@ class MenuCommand implements Command
 
 	private function getLiHtml(string $path, string $text, bool $isSelected): string
 	{
-		$textHtml = Html5::getText($text);
+		$textHtml = $this->html->encode($text);
 
 		if ($isSelected) {
 			return "<li class=\"here\"><a>{$textHtml}</a></li>";
 		}
 
 		$url = $this->url->getUrl($path);
-		$urlHtml = Html5::getAttribute($url);
+		$urlHtml = $this->html->encode($url);
 
 		return "<li><a href=\"{$urlHtml}\">{$textHtml}</a></li>";
 	}

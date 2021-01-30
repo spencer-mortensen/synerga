@@ -41,6 +41,7 @@ use Synerga\Commands\FormAuthenticateCommand;
 use Synerga\Commands\GetCommand;
 use Synerga\Commands\HeadCommand;
 use Synerga\Commands\HostCommand;
+use Synerga\Commands\HtmlCommand;
 use Synerga\Commands\Html5NodeCommand;
 use Synerga\Commands\HttpCommand;
 use Synerga\Commands\IfCommand;
@@ -113,7 +114,7 @@ class SynergaFactory extends Factory
 		$logPath = $errors['log'];
 
 		$logger = new FileLogger($logPath);
-		$handler = new ErrorHandler($logger, $display);
+		$handler = new ErrorHandler($logger, $display, $this->html);
 		return new ErrorHandling($handler, $level);
 	}
 
@@ -159,7 +160,7 @@ class SynergaFactory extends Factory
 	
 	public function newHeadCommand(): HeadCommand
 	{
-		return new HeadCommand($this->page);
+		return new HeadCommand($this->page, $this->html);
 	}
 
 	public function newHostCommand(): HostCommand
@@ -174,9 +175,22 @@ class SynergaFactory extends Factory
 		return new BodyCommand($this->page);
 	}
 
+	public function newHtml(): Html
+	{
+		// TODO: get page format from the configuration file
+		$format = 'HTML5';
+
+		return new Html($format);
+	}
+
+	public function newHtmlCommand(): HtmlCommand
+	{
+		return new HtmlCommand($this->html);
+	}
+
 	public function newHtml5NodeCommand(): Html5NodeCommand
 	{
-		return new Html5NodeCommand();
+		return new Html5NodeCommand($this->html);
 	}
 	
 	public function newHttpCommand(): HttpCommand
@@ -223,7 +237,7 @@ class SynergaFactory extends Factory
 
 		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
 
-		return new MathCommand($this->page, $mathjaxUrl);
+		return new MathCommand($this->page, $mathjaxUrl, $this->html);
 	}
 
 	public function newMathLineCommand(): MathLineCommand
@@ -235,17 +249,17 @@ class SynergaFactory extends Factory
 
 		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
 
-		return new MathLineCommand($this->page, $mathjaxUrl);
+		return new MathLineCommand($this->page, $mathjaxUrl, $this->html);
 	}
 	
 	public function newMenuCommand(): MenuCommand
 	{
-		return new MenuCommand($this->url);
+		return new MenuCommand($this->url, $this->html);
 	}
 
 	public function newMenuUpCommand(): MenuUpCommand
 	{
-		return new MenuUpCommand($this->url, $this->data, $this->interpreter);
+		return new MenuUpCommand($this->url, $this->data, $this->interpreter, $this->html);
 	}
 
 	public function newMime(): Mime

@@ -25,7 +25,7 @@
 
 namespace Synerga;
 
-use Synerga\Exceptions\ArgumentException;
+use Synerga\ErrorHandling\Exceptions\ArgumentException;
 
 class Arguments
 {
@@ -46,8 +46,7 @@ class Arguments
 			throw new InvalidArgumentException("Missing argument {$i}");
 		}
 
-		$argument = $this->arguments[$i] ?? null;
-		return $this->evaluator->evaluate($argument);
+		return $this->evaluator->evaluate($this->arguments[$i]);
 	}
 
 	public function count(): int

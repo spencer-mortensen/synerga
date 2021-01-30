@@ -23,33 +23,43 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\ErrorHandling\Exceptions;
 
 use Exception;
-use Synerga\Arguments;
-use Synerga\Html;
-use Synerga\Page;
+use Throwable;
 
-class MathLineCommand implements Command
+class EvaluationException extends Exception
 {
-	private $page;
-	private $mathjaxUrl;
-	private $html;
+	/** @var string */
+	private $text;
 
-	public function __construct(Page $page, string $mathjaxUrl, Html $html)
+	/** @var int */
+	private $position;
+
+	/** @var Throwable */
+	private $throwable;
+
+	public function __construct(string $text, int $position, Throwable $throwable)
 	{
-		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
-		$this->html = $html;
+		parent::__construct();
+
+		$this->text = $text;
+		$this->position = $position;
+		$this->throwable = $throwable;
 	}
 
-	public function run(Arguments $arguments)
+	public function getText(): string
 	{
-		$this->page->addJs($this->mathjaxUrl);
+		return $this->text;
+	}
 
-		$tex = $arguments->getString(0);
-		$texHtml = $this->html->encode($tex);
+	public function getPosition(): int
+	{
+		return $this->position;
+	}
 
-		return '$$' . $texHtml . '$$';
+	public function getThrowable(): Throwable
+	{
+		return $this->throwable;
 	}
 }

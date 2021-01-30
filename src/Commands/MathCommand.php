@@ -27,17 +27,20 @@ namespace Synerga\Commands;
 
 use Exception;
 use Synerga\Arguments;
-use Synerga\Html5;
+use Synerga\Html;
 use Synerga\Page;
 
 class MathCommand implements Command
 {
+	private $page;
 	private $mathjaxUrl;
+	private $html;
 
-	public function __construct(Page $page, string $mathjaxUrl)
+	public function __construct(Page $page, string $mathjaxUrl, Html $html)
 	{
 		$this->page = $page;
 		$this->mathjaxUrl = $mathjaxUrl;
+		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
@@ -45,7 +48,7 @@ class MathCommand implements Command
 		$this->page->addJs($this->mathjaxUrl);
 
 		$tex = $arguments->getString(0);
-		$texHtml = Html5::getText($tex);
+		$texHtml = $this->html->encode($tex);
 
 		return "\\({$texHtml}\\)";
 	}

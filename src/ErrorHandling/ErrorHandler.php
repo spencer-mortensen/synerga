@@ -6,24 +6,106 @@ use ErrorException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use SpencerMortensen\Exceptions\ErrorHandlerInterface;
-use Synerga\Exceptions\SynergaExceptionInterface;
+use Synerga\ErrorHandling\Exceptions\EvaluationException;
+use Synerga\ErrorHandling\Exceptions\FileException;
+use Synerga\ErrorHandling\Exceptions\ParserException;
+use Synerga\ErrorHandling\Pages\GenericErrorPage;
+use Synerga\ErrorHandling\Pages\CodePage;
+use Synerga\Html;
 use Throwable;
 
 class ErrorHandler implements ErrorHandlerInterface
 {
 	private $logger;
 	private $display;
+	private $html;
 
-	public function __construct(LoggerInterface $logger, bool $display)
+	public function __construct(LoggerInterface $logger, bool $display, Html $html)
 	{
 		$this->logger = $logger;
 		$this->display = $display;
+		$this->html = $html;
 	}
 
 	public function handleThrowable(Throwable $throwable)
 	{
-		$this->logThrowable($throwable);
 		$this->showThrowable($throwable);
+		$this->logThrowable($throwable);
+	}
+
+	private function showThrowable(Throwable $throwable)
+	{
+		if (!$this->display) {
+			$this->showVagueError($throwable);
+		}
+
+		if ($throwable instanceof FileException) {
+			$path = $throwable->getPath();
+			$throwable = $throwable->getException();
+		} else {
+			$path = null;
+		}
+
+		if ($throwable instanceof EvaluationException) {
+			$this->showEvaluationError($path, $throwable);
+		}
+
+		$this->showGenericError($throwable);
+	}
+
+	private function showVagueError(Throwable $throwable)
+	{
+		$message = 'Please check the error log for more information.';
+		$context = null;
+
+		$page = new GenericErrorPage($this->html);
+		$pageHtml = $page->getHtml($message, $context);
+
+		$http = new Http500();
+		$http->send($pageHtml);
+	}
+
+	private function showEvaluationError($path, EvaluationException $exception)
+	{
+		$title = 'Evaluation Error';
+		$titleHtml = $this->html->encode($title);
+		$bodyHtml = "<h1>{$titleHtml}</h1>";
+
+		if ($path !== null) {
+			$pathHtml = $this->html->encode($path);
+			$bodyHtml .= "<p>in “{$pathHtml}”:</p>";
+		}
+
+		$text = $exception->getText();
+		$position = $exception->getPosition();
+		$child = $exception->getThrowable();
+		$expectation = $this->getMessage($child);
+
+		$page = new CodePage($this->html);
+		$pageHtml = $page->getHtml($title, $bodyHtml, $text, $position, $expectation);
+
+		$http = new Http500();
+		$http->send($pageHtml);
+	}
+
+	private function getMessage(Throwable $throwable): string
+	{
+		return $throwable->getMessage();
+	}
+
+	private function showGenericError(Throwable $throwable)
+	{
+		$message = $throwable->getMessage();
+		$context = [
+			'file' => $throwable->getFile(),
+			'line' => $throwable->getLine()
+		];
+
+		$page = new GenericErrorPage($this->html);
+		$pageHtml = $page->getHtml($message, $context);
+
+		$http = new Http500();
+		$http->send($pageHtml);
 	}
 
 	private function logThrowable(Throwable $throwable)
@@ -80,22 +162,5 @@ class ErrorHandler implements ErrorHandlerInterface
 		$line = $throwable->getLine();
 
 		return "{$messageText} in {$fileAbsolutePathText}:{$line}";
-	}
-
-	private function showThrowable(Throwable $throwable)
-	{
-		if ($this->display) {
-			$message = $throwable->getMessage();
-			$context = [
-				'file' => $throwable->getFile(),
-				'line' => $throwable->getLine()
-			];
-		} else {
-			$message = 'Please check the error log for more information.';
-			$context = null;
-		}
-
-		$error = new Error500();
-		$error->send($message, $context);
 	}
 }

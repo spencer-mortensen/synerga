@@ -27,8 +27,11 @@ namespace Synerga\Commands;
 
 use Synerga\Arguments;
 use Synerga\Data;
+use Synerga\ErrorHandling\Exceptions\FileException;
+use Synerga\ErrorHandling\Exceptions\EvaluationException;
 use Synerga\Interpreter\Interpreter;
 use Synerga\Page;
+use Throwable;
 
 class PageCommand implements Command
 {
@@ -80,7 +83,11 @@ class PageCommand implements Command
 			return null;
 		}
 
-		$value = $this->interpreter->interpret($contents);
+		try {
+			$value = $this->interpreter->interpret($contents);
+		} catch (EvaluationException $exception) {
+			throw new FileException($path, $exception);
+		}
 
 		if (strlen($value) === 0) {
 			return null;
