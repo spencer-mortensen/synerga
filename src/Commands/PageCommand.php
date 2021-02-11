@@ -25,12 +25,14 @@
 
 namespace Synerga\Commands;
 
+use Exception;
 use Synerga\Arguments;
 use Synerga\Data;
 use Synerga\ErrorHandling\Exceptions\FileException;
 use Synerga\ErrorHandling\Exceptions\EvaluationException;
 use Synerga\Interpreter\Interpreter;
 use Synerga\Page;
+use Synerga\StringInput;
 use Throwable;
 
 class PageCommand implements Command
@@ -53,15 +55,14 @@ class PageCommand implements Command
 			$this->setPage($path);
 		}
 
-		return $this->page->getHtml();
+		return $this->page->getBody();
 	}
 
 	private function setPage(string $path)
 	{
 		$this->setTitle($path);
-		$this->addCss($path);
-		$this->addJs($path);
-		$this->setHtml($path);
+		$this->addHead($path);
+		$this->setBody($path);
 	}
 
 	private function setTitle(string $path)
@@ -96,44 +97,39 @@ class PageCommand implements Command
 		return $value;
 	}
 
-	private function addCss(string $path)
+	private function addHead(string $path)
 	{
-		$css = $this->getArray("{$path}.css/");
+		$html = $this->getString("{$path}.head/");
 
-		if ($css === null) {
+		if ($html === null) {
 			return;
 		}
 
-		foreach ($css as $url) {
-			$this->page->addCss($url);
+		if (!$this->getElements($html, $head)) {
+			throw new Exception('Unknown head elements');
 		}
+
+		$this->page->addHead($head);
 	}
 
-	private function getArray($path)
+	private function getElements(string $html, &$head): bool
 	{
-		$text = $this->getString($path);
+		$head = [];
 
-		if ($text === null) {
-			return null;
+		$input = new StringInput($html);
+		$input->readRe('\\s*');
+
+		while (
+			$input->readRe('<([a-z]+)\\b[^>]*>(?:[^<]*</\\1>)?', $match) &&
+			$input->readRe('\\s*')
+		) {
+			$head[] = $match[0];
 		}
 
-		return array_map('trim', explode("\n", $text));
+		return $input->readEnd();
 	}
 
-	private function addJs(string $path)
-	{
-		$js = $this->getArray("{$path}.js/");
-
-		if ($js === null) {
-			return;
-		}
-
-		foreach ($js as $url) {
-			$this->page->addJs($url);
-		}
-	}
-
-	private function setHtml(string $path)
+	private function setBody(string $path)
 	{
 		$html = $this->getString("{$path}.body/");
 
@@ -141,6 +137,6 @@ class PageCommand implements Command
 			return;
 		}
 
-		$this->page->setHtml($html);
+		$this->page->setBody($html);
 	}
 }

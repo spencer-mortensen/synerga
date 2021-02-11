@@ -33,6 +33,7 @@ use Synerga\Authenticators\TokenAuthenticator;
 use Synerga\Commands\AndCommand;
 use Synerga\Commands\BodyCommand;
 use Synerga\Commands\CookieAuthenticateCommand;
+use Synerga\Commands\CssCommand;
 use Synerga\Commands\DateCommand;
 use Synerga\Commands\EqualCommand;
 use Synerga\Commands\ExistsCommand;
@@ -48,6 +49,7 @@ use Synerga\Commands\IfCommand;
 use Synerga\Commands\IncludeCommand;
 use Synerga\Commands\IntegerCommand;
 use Synerga\Commands\JoinCommand;
+use Synerga\Commands\JsCommand;
 use Synerga\Commands\MatchCommand;
 use Synerga\Commands\MathCommand;
 use Synerga\Commands\MathLineCommand;
@@ -92,6 +94,11 @@ class SynergaFactory extends Factory
 		$cookiesOptions = $this->settings['cookies']['options'] ?? null;
 
 		return new Cookies($cookiesOptions);
+	}
+
+	public function newCssCommand(): CssCommand
+	{
+		return new CssCommand($this->html);
 	}
 
 	public function newData(): Data
@@ -223,6 +230,11 @@ class SynergaFactory extends Factory
 		return new JoinCommand();
 	}
 
+	public function newJsCommand(): JsCommand
+	{
+		return new JsCommand($this->html);
+	}
+
 	public function newMatchCommand(): MatchCommand
 	{
 		return new MatchCommand($this->variables);
@@ -230,26 +242,12 @@ class SynergaFactory extends Factory
 	
 	public function newMathCommand(): MathCommand
 	{
-		/*
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-		*/
-
-		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
-
-		return new MathCommand($this->page, $mathjaxUrl, $this->html);
+		return new MathCommand($this->page, $this->html);
 	}
 
 	public function newMathLineCommand(): MathLineCommand
 	{
-		/*
-<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-		*/
-
-		$mathjaxUrl = 'https://cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS_CHTML';
-
-		return new MathLineCommand($this->page, $mathjaxUrl, $this->html);
+		return new MathLineCommand($this->page, $this->html);
 	}
 	
 	public function newMenuCommand(): MenuCommand

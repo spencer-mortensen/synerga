@@ -23,7 +23,7 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Interpreter;
+namespace Synerga;
 
 class StringInput
 {

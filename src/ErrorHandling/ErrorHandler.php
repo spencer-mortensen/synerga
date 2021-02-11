@@ -59,7 +59,7 @@ class ErrorHandler implements ErrorHandlerInterface
 		$context = null;
 
 		$page = new GenericErrorPage($this->html);
-		$pageHtml = $page->getHtml($message, $context);
+		$pageHtml = $page->getBody($message, $context);
 
 		$http = new Http500();
 		$http->send($pageHtml);
@@ -82,7 +82,7 @@ class ErrorHandler implements ErrorHandlerInterface
 		$expectation = $this->getMessage($child);
 
 		$page = new CodePage($this->html);
-		$pageHtml = $page->getHtml($title, $bodyHtml, $text, $position, $expectation);
+		$pageHtml = $page->getBody($title, $bodyHtml, $text, $position, $expectation);
 
 		$http = new Http500();
 		$http->send($pageHtml);
@@ -102,7 +102,7 @@ class ErrorHandler implements ErrorHandlerInterface
 		];
 
 		$page = new GenericErrorPage($this->html);
-		$pageHtml = $page->getHtml($message, $context);
+		$pageHtml = $page->getBody($message, $context);
 
 		$http = new Http500();
 		$http->send($pageHtml);

@@ -26,10 +26,11 @@
 namespace Synerga\Interpreter;
 
 use Exception;
-use Synerga\Evaluator;
 use Synerga\ErrorHandling\Exceptions\EvaluationException;
 use Synerga\ErrorHandling\Exceptions\FileException;
 use Synerga\ErrorHandling\Exceptions\ParserException;
+use Synerga\Evaluator;
+use Synerga\StringInput;
 use Throwable;
 
 class Interpreter
@@ -124,16 +125,19 @@ class Interpreter
 				throw $throwable;
 			}
 
-			if (!is_string($result)) {
-				$code = $input->getInput();
-				$position = $input->getPosition();
-				$message = 'Expected a string value';
-				$exception = new Exception($message);
+			if ($result !== null) {
+				if (!is_string($result)) {
+					$code = $input->getInput();
+					$position = $input->getPosition();
+					$message = 'Expected a string value';
+					$exception = new Exception($message);
 
-				throw new EvaluationException($code, $position, $exception);
+					throw new EvaluationException($code, $position, $exception);
+				}
+
+				$output .= $result;
 			}
 
-			$output .= $result;
 			$iBegin = $input->getPosition();
 		}
 

@@ -39,6 +39,6 @@ class BodyCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		return $this->page->getHtml();
+		return $this->page->getBody();
 	}
 }

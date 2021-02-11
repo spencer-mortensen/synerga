@@ -23,58 +23,34 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Commands;
 
-class Page
+use Synerga\Arguments;
+use Synerga\Html;
+
+class JsCommand implements Command
 {
-	private $title;
-	private $head;
-	private $body;
+	private $html;
 
-	public function __construct()
+	public function __construct(Html $html)
 	{
-		$this->title = '';
-		$this->head = [];
-		$this->body = '';
+		$this->html = $html;
 	}
 
-	public function setTitle(string $title)
+	public function run(Arguments $arguments)
 	{
-		$this->title = $title;
+		$url = $arguments->getString(0);
+		$order = $arguments->getOptionalString(1) ?? 'defer';
+		return $this->getJsHtml($url, $order);
 	}
 
-	public function getTitle(): string
+	private function getJsHtml(string $url, string $order): string
 	{
-		return $this->title;
-	}
+		$urlHtml = $this->html->encode($url);
+		$orderHtml = $this->html->encode($order);
 
-	public function setHead(array $head)
-	{
-		$this->head = $head;
-	}
-
-	public function getHead(): array
-	{
-		return array_values($this->head);
-	}
-
-	public function addHead(array $head)
-	{
-		$this->head = array_merge($this->head, array_combine($head, $head));
-	}
-
-	public function addHeadElement(string $html)
-	{
-		$this->head[$html] = $html;
-	}
-
-	public function setBody(string $body)
-	{
-		$this->body = $body;
-	}
-
-	public function getBody(): string
-	{
-		return $this->body;
+		return <<<"EOS"
+<script src="{$urlHtml}" {$orderHtml}></script>
+EOS;
 	}
 }

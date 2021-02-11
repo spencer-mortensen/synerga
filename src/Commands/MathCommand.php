@@ -33,19 +33,18 @@ use Synerga\Page;
 class MathCommand implements Command
 {
 	private $page;
-	private $mathjaxUrl;
 	private $html;
 
-	public function __construct(Page $page, string $mathjaxUrl, Html $html)
+	public function __construct(Page $page, Html $html)
 	{
 		$this->page = $page;
-		$this->mathjaxUrl = $mathjaxUrl;
 		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		$this->page->addJs($this->mathjaxUrl);
+		$this->page->addHeadElement('<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>');
+		$this->page->addHeadElement('<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>');
 
 		$tex = $arguments->getString(0);
 		$texHtml = $this->html->encode($tex);

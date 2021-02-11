@@ -45,66 +45,70 @@ class HeadCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		$elements = [];
+		$title = null;
+		$css = [];
+		$js = [];
 
-		$this->addTitle($elements);
-		$this->addCss($elements);
-		$this->addJs($elements);
+		$head = $this->page->getHead();
+		$head = array_reverse($head);
 
-		if (count($elements) === '') {
+		foreach ($head as $i => $html) {
+			if ($this->isCss($html)) {
+				$css[] = $html;
+				unset($head[$i]);
+			} elseif ($this->isJs($html)) {
+				$js[] = $html;
+				unset($head[$i]);
+			} elseif ($this->isTitle($html)) {
+				$title = $html;
+			}
+		}
+
+		if ($title === null) {
+			$title = $this->getTitleHtml();
+		}
+
+		return $this->getHeadHtml($title, $css, $js, $head);
+	}
+
+	private function isCss(string $html): bool
+	{
+		return (strncmp($html, '<link', 5) === 0) &&
+			(strpos($html, 'rel="stylesheet"') !== false);
+	}
+
+	private function isJs(string $html): bool
+	{
+		return strncmp($html, '<script', 7) === 0;
+	}
+
+	private function isTitle(string $html): bool
+	{
+		return strncmp($html, '<title', 6) === 0;
+	}
+
+	private function getTitleHtml(): string
+	{
+		$title = $this->page->getTitle();
+		$titleHtml = $this->html->encode($title);
+
+		return "<title>{$titleHtml}</title>";
+	}
+
+	private function getHeadHtml(string $title, array $css, array $js, array $head): string
+	{
+		return "\n\t" . $title .
+			$this->getArrayHtml($css) .
+			$this->getArrayHtml($js) .
+			$this->getArrayHtml($head);
+	}
+
+	private function getArrayHtml(array $elements): string
+	{
+		if (count($elements) === 0) {
 			return '';
 		}
 
 		return "\n\t" . implode("\n\t", $elements);
-	}
-
-	private function addTitle(array &$elements)
-	{
-		$title = $this->page->getTitle();
-
-		$elements[] = $this->getTitleHtml($title);
-	}
-
-	private function getTitleHtml(string $value): string
-	{
-		$valueHtml = $this->html->encode($value);
-
-		return "<title>{$valueHtml}</title>";
-	}
-
-	private function addCss(array &$elements)
-	{
-		$css = $this->page->getCss();
-
-		foreach ($css as $url) {
-			$elements[] = $this->getCssHtml($url);
-		}
-	}
-
-	private function getCssHtml(string $url): string
-	{
-		$urlHtml = $this->html->encode($url);
-
-		return <<<"EOS"
-<link href="{$urlHtml}" rel="stylesheet" type="text/css">
-EOS;
-	}
-
-	private function addJs(array &$elements)
-	{
-		$js = $this->page->getJs();
-
-		foreach ($js as $url) {
-			$elements[] = $this->getJsHtml($url);
-		}
-	}
-
-	private function getJsHtml(string $url): string
-	{
-		$urlHtml = $this->html->encode($url);
-
-		return <<<"EOS"
-<script src="{$urlHtml}" defer></script>
-EOS;
 	}
 }

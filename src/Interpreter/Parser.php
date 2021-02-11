@@ -27,6 +27,7 @@ namespace Synerga\Interpreter;
 
 use Exception;
 use Synerga\Call;
+use Synerga\StringInput;
 
 class Parser
 {
