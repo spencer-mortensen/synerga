@@ -40,7 +40,7 @@ class UrlCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		$path = $arguments->getOptionalString(0);
+		$path = $arguments->getString(0);
 		$isAbsolute = $arguments->getOptionalBoolean(1);
 
 		return $this->url->getUrl($path, $isAbsolute);

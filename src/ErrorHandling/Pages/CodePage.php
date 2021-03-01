@@ -22,7 +22,7 @@ class CodePage
 		$pageCss = $this->getPageCss();
 
 		$page = new SitePage($this->html);
-		return $page->getBody($title, $bodyHtml, $pageCss);
+		return $page->getHtml($title, $bodyHtml, $pageCss);
 	}
 
 	private function getPageCss(): string

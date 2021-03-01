@@ -25,6 +25,7 @@
 
 namespace Synerga\Commands;
 
+use Exception;
 use Synerga\Arguments;
 use Synerga\Data;
 use Synerga\Interpreter\Interpreter;
@@ -49,7 +50,8 @@ class ReadCommand implements Command
 		$contents = $this->data->read($path);
 
 		if ($contents === null) {
-			return null;
+			$message = 'Missing file ' . var_export($path, true);
+			throw new Exception($message);
 		}
 
 		return $this->interpreter->interpret($contents);

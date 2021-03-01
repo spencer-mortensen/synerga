@@ -65,6 +65,7 @@ use Synerga\Commands\SchemeCommand;
 use Synerga\Commands\SetCommand;
 use Synerga\Commands\SiteCommand;
 use Synerga\Commands\StringCommand;
+use Synerga\Commands\TimeCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
 use Synerga\Commands\UrlCommand;
@@ -336,6 +337,11 @@ class SynergaFactory extends Factory
 		return new StringCommand();
 	}
 	
+	public function newTimeCommand(): TimeCommand
+	{
+		return new TimeCommand();
+	}
+
 	public function newTitleCommand(): TitleCommand
 	{
 		return new TitleCommand($this->page);

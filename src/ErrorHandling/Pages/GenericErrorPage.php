@@ -21,7 +21,7 @@ class GenericErrorPage
 		$bodyHtml = $this->getBodyHtml($message, $context);
 
 		$page = new SitePage($this->html);
-		return $page->getBody($title, $bodyHtml, $pageCss);
+		return $page->getHtml($title, $bodyHtml, $pageCss);
 	}
 
 	private function getPageCss(): string

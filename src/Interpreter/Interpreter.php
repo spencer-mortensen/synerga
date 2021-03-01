@@ -47,7 +47,7 @@ class Interpreter
 		$this->evaluator = $evaluator;
 	}
 
-	public function run(string $code): string
+	public function run(string $code)
 	{
 		$input = new StringInput($code);
 

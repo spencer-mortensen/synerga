@@ -5,11 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+
+## [0.0.37] - 2021-03-01
+### Added
+ - Added a new command, which returns the current UNIX time:
+	(time)
+### Changed
+ - In the command "(file path alternative)", the "alternative" parameter was removed.
+     Add an "(exists path)" condition to your code!
+
 ## [0.0.36] - 2021-02-11
 ### Added
  - Added two new commands:
 	(js "path/script.js" "defer")
-	(css "path/style.js")
+	(css "path/style.css")
 ### Changed
  - Merged the ".js" and ".css" files (which contained paths) into a new ".head" file (which contains head HTML)
 

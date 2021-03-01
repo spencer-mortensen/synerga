@@ -40,7 +40,7 @@ class Html5NodeCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		$name = $arguments->getOptionalString(0);
+		$name = $arguments->getString(0);
 		$attributes = $arguments->getOptionalArray(1);
 		$innerHtml = $arguments->getOptionalString(2);
 

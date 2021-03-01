@@ -26,29 +26,11 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\File;
 
-class FileCommand implements Command
+class TimeCommand implements Command
 {
-	/** @var Data */
-	private $data;
-
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
-	{
-		$this->data = $data;
-		$this->file = $file;
-	}
-
 	public function run(Arguments $arguments)
 	{
-		$path = $arguments->getString(0);
-
-		if ($this->data->isFile($path)) {
-			$this->file->send($path);
-		}
+		return time();
 	}
 }

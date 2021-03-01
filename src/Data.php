@@ -129,7 +129,7 @@ class Data
 		return $mtime;
 	}
 
-	private function getAbsolutePath(string $path)
+	public function getAbsolutePath(string $path)
 	{
 		return rtrim("{$this->dataDirectory}/{$path}", '/');
 	}
