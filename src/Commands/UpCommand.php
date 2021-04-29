@@ -26,29 +26,39 @@
 namespace Synerga\Commands;
 
 use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\Documents\File;
 
-class FileCommand implements Command
+class UpCommand implements Command
 {
-	/** @var Data */
-	private $data;
-
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
-	{
-		$this->data = $data;
-		$this->file = $file;
-	}
-
 	public function run(Arguments $arguments)
 	{
 		$path = $arguments->getString(0);
+		$n = $arguments->getOptionalInteger(1) ?? 1;
 
-		if ($this->data->isFile($path)) {
-			$this->file->send($path);
+		$atoms = $this->getAtoms($path);
+		$parentAtoms = array_slice($atoms, 0, -1 * $n);
+
+		return $this->getPath($parentAtoms);
+	}
+
+	private function getAtoms(string $path): array
+	{
+		$path = trim($path, '/');
+
+		if (strlen($path) === 0) {
+			return [];
 		}
+
+		return explode('/', $path);
+	}
+
+	private function getPath(array $atoms): string
+	{
+		$path = implode('/', $atoms);
+
+		if (strlen($path) !== 0) {
+			$path .= '/';
+		}
+
+		return $path;
 	}
 }

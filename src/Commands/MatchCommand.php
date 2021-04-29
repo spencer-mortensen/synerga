@@ -39,8 +39,8 @@ class MatchCommand implements Command
 
 	public function run(Arguments $arguments)
 	{
-		$input = $arguments->getString(0);
-		$expression = $arguments->getString(1);
+		$expression = $arguments->getString(0);
+		$input = $arguments->getString(1);
 
 		$pattern = self::getPattern($expression);
 

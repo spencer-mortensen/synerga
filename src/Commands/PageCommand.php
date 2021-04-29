@@ -109,7 +109,7 @@ class PageCommand implements Command
 			throw new Exception('Unknown head elements');
 		}
 
-		$this->page->addHead($head);
+		$this->page->addHead(array_reverse($head));
 	}
 
 	private function getElements(string $html, &$head): bool

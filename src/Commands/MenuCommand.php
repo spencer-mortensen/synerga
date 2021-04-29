@@ -47,17 +47,17 @@ class MenuCommand implements Command
 	public function run(Arguments $arguments)
 	{
 		$map = $arguments->getArray(0);
-		$selectedPath = $this->url->getPath();
+		$currentPath = $this->url->getPath();
 
-		return $this->getUlHtml($map, $selectedPath);
+		return $this->getUlHtml($map, $currentPath);
 	}
 
-	private function getUlHtml(array $map, string $selectedPath): string
+	private function getUlHtml(array $map, string $currentPath): string
 	{
 		$lis = [];
 
 		foreach ($map as $path => $text) {
-			$isSelected = ($path === $selectedPath);
+			$isSelected = (strncmp($currentPath, $path, strlen($path)) === 0);
 			$lis[] = $this->getLiHtml($path, $text, $isSelected);
 		}
 

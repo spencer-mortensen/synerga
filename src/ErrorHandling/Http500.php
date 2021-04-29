@@ -2,18 +2,19 @@
 
 namespace Synerga\ErrorHandling;
 
+use Synerga\Documents\Response;
+
 class Http500
 {
 	public function send(string $content)
 	{
-		$contentLength = strlen($content);
-
 		ob_end_clean();
 
-		header("HTTP/1.1 500 Internal Server Error");
-		header("Content-Length: {$contentLength}");
-		echo $content;
+		$code = '500 Internal Server Error';
+		$headers = [];
 
+		$response = new Response($code, $headers, $content);
+		$response->send();
 		exit(1);
 	}
 }

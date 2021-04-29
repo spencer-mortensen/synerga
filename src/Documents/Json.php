@@ -23,32 +23,23 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\Documents;
 
-use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\Documents\File;
+use Exception;
 
-class FileCommand implements Command
+class Json
 {
-	/** @var Data */
-	private $data;
-
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
+	public function send($value)
 	{
-		$this->data = $data;
-		$this->file = $file;
-	}
+		$status = '200 OK';
 
-	public function run(Arguments $arguments)
-	{
-		$path = $arguments->getString(0);
+		$headers = [
+			'Content-Type' => 'application/json'
+		];
 
-		if ($this->data->isFile($path)) {
-			$this->file->send($path);
-		}
+		$content = json_encode($value);
+
+		$response = new Response($status, $headers, $content);
+		$response->send();
 	}
 }

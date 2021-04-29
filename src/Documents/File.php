@@ -23,9 +23,11 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga;
+namespace Synerga\Documents;
 
 use Exception;
+use Synerga\Data;
+use Synerga\Mime;
 
 class File
 {

@@ -25,6 +25,7 @@
 
 namespace Synerga;
 
+use InvalidArgumentException;
 use Synerga\ErrorHandling\Exceptions\ArgumentException;
 
 class Arguments

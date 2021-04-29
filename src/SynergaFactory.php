@@ -50,11 +50,11 @@ use Synerga\Commands\IncludeCommand;
 use Synerga\Commands\IntegerCommand;
 use Synerga\Commands\JoinCommand;
 use Synerga\Commands\JsCommand;
+use Synerga\Commands\LinkCommand;
 use Synerga\Commands\MatchCommand;
 use Synerga\Commands\MathCommand;
 use Synerga\Commands\MathLineCommand;
 use Synerga\Commands\MenuCommand;
-use Synerga\Commands\MenuUpCommand;
 use Synerga\Commands\NotCommand;
 use Synerga\Commands\OrCommand;
 use Synerga\Commands\PageCommand;
@@ -68,7 +68,9 @@ use Synerga\Commands\StringCommand;
 use Synerga\Commands\TimeCommand;
 use Synerga\Commands\TitleCommand;
 use Synerga\Commands\TokenAuthenticateCommand;
+use Synerga\Commands\UpCommand;
 use Synerga\Commands\UrlCommand;
+use Synerga\Documents\File;
 use Synerga\ErrorHandling\ErrorHandler;
 use Synerga\Interpreter\Interpreter;
 use Synerga\Interpreter\Parser;
@@ -236,6 +238,11 @@ class SynergaFactory extends Factory
 		return new JsCommand($this->html);
 	}
 
+	public function newLinkCommand(): LinkCommand
+	{
+		return new LinkCommand($this->data, $this->interpreter, $this->url, $this->html);
+	}
+
 	public function newMatchCommand(): MatchCommand
 	{
 		return new MatchCommand($this->variables);
@@ -254,11 +261,6 @@ class SynergaFactory extends Factory
 	public function newMenuCommand(): MenuCommand
 	{
 		return new MenuCommand($this->url, $this->html);
-	}
-
-	public function newMenuUpCommand(): MenuUpCommand
-	{
-		return new MenuUpCommand($this->url, $this->data, $this->interpreter, $this->html);
 	}
 
 	public function newMime(): Mime
@@ -360,6 +362,11 @@ class SynergaFactory extends Factory
 	public function newTokens(): Tokens
 	{
 		return new Tokens($this->data);
+	}
+
+	public function newUpCommand(): UpCommand
+	{
+		return new UpCommand();
 	}
 
 	public function newUrl(): Url

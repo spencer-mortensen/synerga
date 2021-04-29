@@ -23,32 +23,37 @@
  * @copyright 2017 Spencer Mortensen
  */
 
-namespace Synerga\Commands;
+namespace Synerga\Documents;
 
-use Synerga\Arguments;
-use Synerga\Data;
-use Synerga\Documents\File;
+use Exception;
 
-class FileCommand implements Command
+class Response
 {
-	/** @var Data */
-	private $data;
+	private $code;
+	private $headers;
+	private $content;
 
-	/** @var File */
-	private $file;
-
-	public function __construct(Data $data, File $file)
+	public function __construct(string $code, array $headers = [], string $content = null)
 	{
-		$this->data = $data;
-		$this->file = $file;
+		$this->code = $code;
+		$this->headers = $headers;
+		$this->content = $content;
 	}
 
-	public function run(Arguments $arguments)
+	public function send()
 	{
-		$path = $arguments->getString(0);
+		header("HTTP/1.1 {$this->code}");
 
-		if ($this->data->isFile($path)) {
-			$this->file->send($path);
+		if ($this->content !== null) {
+			$this->headers['Content-Length'] = (string)strlen($this->content);
+		}
+
+		foreach ($this->headers as $key => $value) {
+			header("{$key}: {$value}");
+		}
+
+		if ($this->content !== null) {
+			echo $this->content;
 		}
 	}
 }

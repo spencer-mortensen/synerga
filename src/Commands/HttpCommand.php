@@ -27,6 +27,7 @@ namespace Synerga\Commands;
 
 use Exception;
 use Synerga\Arguments;
+use Synerga\Documents\Response;
 
 class HttpCommand implements Command
 {
@@ -48,15 +49,8 @@ class HttpCommand implements Command
 
 	private function send(string $code, string $content = null)
 	{
-		header("HTTP/1.1 {$code}");
-
-		if ($content === null) {
-			return;
-		}
-
-		$contentLength = strlen($content);
-
-		header("Content-Length: {$contentLength}");
-		echo $content;
+		$headers = [];
+		$response = new Response($code, $headers, $content);
+		$response->send();
 	}
 }

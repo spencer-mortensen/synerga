@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.38] - 2021-04-29
+### Added
+ - Added the "link" command, which creates an HTML link to a page using the page title as the text:
+	(link path)
+ - Added the "up" command, which returns the ancestor of any given path (optionally going up a given number of directories)
+	(up path)
+	(up path 2)
+### Changed
+ - In the "match" command, the first two arguments have been flipped
+### Removed
+ - Removed the "menu-up" comand. Use this instead:
+	(link (up path))
 
 ## [0.0.37] - 2021-03-01
 ### Added

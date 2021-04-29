@@ -32,58 +32,38 @@ use Synerga\Html;
 use Synerga\Interpreter\Interpreter;
 use Synerga\Url;
 
-class MenuUpCommand implements Command
+class LinkCommand implements Command
 {
-	/** @var Url */
-	private $url;
-
 	/** @var Data */
 	private $data;
 
 	/** @var Interpreter */
 	private $interpreter;
 
+	/** @var Url */
+	private $url;
+
 	/** @var Html */
 	private $html;
 
-	public function __construct(Url $url, Data $data, Interpreter $interpreter, Html $html)
+	public function __construct(Data $data, Interpreter $interpreter, Url $url, Html $html)
 	{
-		$this->url = $url;
 		$this->data = $data;
 		$this->interpreter = $interpreter;
+		$this->url = $url;
 		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		$url = $this->getParentUrl();
-		$title = $this->getText("{$url}.page/.title/");
+		$path = $arguments->getString(0);
 
-		return $this->getAHtml($url, $title);
+		$title = $this->getTitle("{$path}.page/.title/");
+
+		return $this->getAHtml($path, $title);
 	}
 
-	private function getParentUrl(): string
-	{
-		$url = $this->url->getPath();
-		$atoms = $this->getAtoms($url);
-
-		array_pop($atoms);
-
-		return implode('/', $atoms) . '/';
-	}
-
-	private function getAtoms(string $url): array
-	{
-		$url = rtrim($url, '/');
-
-		if (strlen($url) === 0) {
-			return [];
-		}
-
-		return explode('/', $url);
-	}
-
-	private function getText(string $path): string
+	private function getTitle(string $path): string
 	{
 		$text = $this->data->read($path);
 
