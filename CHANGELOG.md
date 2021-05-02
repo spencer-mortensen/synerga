@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.39] - 2021-05-02
+### Changed
+ - The MathJax library now loads faster
+
 ## [0.0.38] - 2021-04-29
 ### Added
  - Added the "link" command, which creates an HTML link to a page using the page title as the text:
