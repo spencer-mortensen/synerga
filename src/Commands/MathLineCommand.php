@@ -45,11 +45,6 @@ class MathLineCommand implements Command
 	{
 		$this->page->addHeadElement('<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>');
 		$this->page->addHeadElement('<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>');
-		$this->page->addHeadElement('<link href="https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Zero.woff" rel="preload" as="font" type="font/woff" crossorigin>');
-		$this->page->addHeadElement('<link href="https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Math-Italic.woff" rel="preload" as="font" type="font/woff" crossorigin>');
-		$this->page->addHeadElement('<link href="https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Main-Regular.woff" rel="preload" as="font" type="font/woff" crossorigin>');
-		$this->page->addHeadElement('<link href="https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size1-Regular.woff" rel="preload" as="font" type="font/woff" crossorigin>');
-		$this->page->addHeadElement('<link href="https://cdn.jsdelivr.net/npm/mathjax@3/es5/output/chtml/fonts/woff-v2/MathJax_Size2-Regular.woff" rel="preload" as="font" type="font/woff" crossorigin>');
 
 		$tex = $arguments->getString(0);
 		$texHtml = $this->html->encode($tex);
