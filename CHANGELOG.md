@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.41] - 2021-05-10
+### Changed
+ - Files are now treated as immutable: use versioning (e.g. "style.2.css") when updating files.
+
 ## [0.0.40] - 2021-05-03
 ### Changed
  - Fonts are no longer preloaded by the MathJax library: you should preload the actual resources you'll need

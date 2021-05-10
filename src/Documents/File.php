@@ -45,14 +45,20 @@ class File
 
 	public function send(string $path)
 	{
-		$eTag = $this->getServerETag($path);
+		$this->sendCacheControlHeader(true);
 
+		$eTag = $this->getServerETag($path);
 		$this->sendETagHeader($eTag);
 
 		$this->sendUnmodifiedHeader($eTag) ||
 		$this->sendFile($path);
+	}
 
-		exit(0);
+	private function sendCacheControlHeader(bool $immutable)
+	{
+		if ($immutable) {
+			header('Cache-Control: public, max-age=31536000, immutable');
+		}
 	}
 
 	private function getServerETag(string $path)
@@ -64,25 +70,6 @@ class File
 		}
 
 		return base_convert($mtime, 10, 36);
-	}
-
-	private function getClientETag()
-	{
-		$eTag = $_SERVER['HTTP_IF_NONE_MATCH'] ?? null;
-
-		if ($eTag === null) {
-			return null;
-		}
-
-		$eTag = trim($eTag, '"');
-
-		$i = strpos($eTag, '-');
-
-		if ($i === false) {
-			return $eTag;
-		}
-
-		return substr($eTag, 0, $i);
 	}
 
 	private function sendETagHeader(string $eTag)
@@ -104,6 +91,25 @@ class File
 		}
 
 		return false;
+	}
+
+	private function getClientETag()
+	{
+		$eTag = $_SERVER['HTTP_IF_NONE_MATCH'] ?? null;
+
+		if ($eTag === null) {
+			return null;
+		}
+
+		$eTag = trim($eTag, '"');
+
+		$i = strpos($eTag, '-');
+
+		if ($i === false) {
+			return $eTag;
+		}
+
+		return substr($eTag, 0, $i);
 	}
 
 	private function sendFile(string $path)
