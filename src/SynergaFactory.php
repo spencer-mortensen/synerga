@@ -53,7 +53,6 @@ use Synerga\Commands\JsCommand;
 use Synerga\Commands\LinkCommand;
 use Synerga\Commands\MatchCommand;
 use Synerga\Commands\MathCommand;
-use Synerga\Commands\MathLineCommand;
 use Synerga\Commands\MenuCommand;
 use Synerga\Commands\NotCommand;
 use Synerga\Commands\OrCommand;
@@ -250,14 +249,9 @@ class SynergaFactory extends Factory
 	
 	public function newMathCommand(): MathCommand
 	{
-		return new MathCommand($this->page, $this->html);
+		return new MathCommand($this->url, $this->page, $this->html);
 	}
 
-	public function newMathLineCommand(): MathLineCommand
-	{
-		return new MathLineCommand($this->page, $this->html);
-	}
-	
 	public function newMenuCommand(): MenuCommand
 	{
 		return new MenuCommand($this->url, $this->html);

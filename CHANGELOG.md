@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.42] - 2021-05-10
+### Removed
+ - Removed the "math-line" command. Use '(math "tex" true)' instead.
+
 ## [0.0.41] - 2021-05-10
 ### Changed
  - Files are now treated as immutable: use versioning (e.g. "style.2.css") when updating files.

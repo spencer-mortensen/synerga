@@ -29,26 +29,54 @@ use Exception;
 use Synerga\Arguments;
 use Synerga\Html;
 use Synerga\Page;
+use Synerga\Url;
 
 class MathCommand implements Command
 {
+	private $url;
 	private $page;
 	private $html;
 
-	public function __construct(Page $page, Html $html)
+	public function __construct(Url $url, Page $page, Html $html)
 	{
+		$this->url = $url;
 		$this->page = $page;
 		$this->html = $html;
 	}
 
 	public function run(Arguments $arguments)
 	{
-		$this->page->addHeadElement('<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>');
-		$this->page->addHeadElement('<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>');
+		$mathScriptHtml = $this->getMathScriptHtml();
+
+		$this->page->addHeadElement('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.9/dist/katex.min.css" integrity="sha384-r/BYDnh2ViiCwqZt5VJVWuADDic3NnnTIEOv4hOh05nSfB6tjWpKmn1kUHOVkMXc" crossorigin="anonymous">');
+		$this->page->addHeadElement('<script defer src="https://cdn.jsdelivr.net/npm/katex@0.13.9/dist/katex.min.js" integrity="sha384-zDIgORxjImEWftZXZpWLs2l57fMX9B3yWFPN5Ecabe211Hm5ZG/OIz2b07DYPUcH" crossorigin="anonymous"></script>');
+		$this->page->addHeadElement($mathScriptHtml);
 
 		$tex = $arguments->getString(0);
+		$display = $arguments->getOptionalBoolean(1) ?? false;
+
+		return $this->getMathElementHtml($tex, $display);
+	}
+
+	private function getMathScriptHtml()
+	{
+		$path = '.config/apps/math/math.min.js';
+		$url = $this->url->getUrl($path);
+		$urlHtml = $this->html->encode($url);
+
+		return "<script src=\"{$urlHtml}\" defer></script>";
+	}
+
+	private function getMathElementHtml(string $tex, bool $display)
+	{
 		$texHtml = $this->html->encode($tex);
 
-		return "\\({$texHtml}\\)";
+		if ($display) {
+			$tagName = 'div';
+		} else {
+			$tagName = 'i';
+		}
+
+		return "<{$tagName} data-tex=\"{$texHtml}\"></{$tagName}>";
 	}
 }
