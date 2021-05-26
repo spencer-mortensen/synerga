@@ -289,9 +289,9 @@ class SynergaFactory extends Factory
 	
 	public function newPathCommand(): PathCommand
 	{
-		$page = $this->settings['url']['page'];
+		$path = $this->settings['url']['path'];
 
-		return new PathCommand($page);
+		return new PathCommand($path);
 	}
 
 	public function newReadCommand(): ReadCommand
@@ -366,9 +366,9 @@ class SynergaFactory extends Factory
 	public function newUrl(): Url
 	{
 		$site = $this->settings['url']['site'];
-		$page = $this->settings['url']['page'];
+		$path = $this->settings['url']['path'];
 
-		return new Url($site, $page);
+		return new Url($site, $path);
 	}
 
 	public function newUrlCommand(): UrlCommand
