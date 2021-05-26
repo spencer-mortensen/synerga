@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.0.45] - 2021-05-26
+### Added
+ - Added $settings['cache']:
+	true: files are immutable (must use file versioning) (for production)
+	false: files are never cached (for development)
+	null: allow client/server to use their own caching heuristics
+
 ## [0.0.44] - 2021-05-26
 ### Changed
  - $settings['url']['page'] has been renamed to $settings['url']['path']

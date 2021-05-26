@@ -144,7 +144,9 @@ class SynergaFactory extends Factory
 
 	public function newFile(): File
 	{
-		return new File($this->data, $this->mime);
+		$cache = $this->settings['cache'];
+
+		return new File($this->data, $this->mime, $cache);
 	}
 
 	public function newFileCommand(): FileCommand

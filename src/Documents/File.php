@@ -37,60 +37,27 @@ class File
 	/** @var Mime */
 	private $mime;
 
-	public function __construct(Data $data, Mime $mime)
+	/** @var mixed */
+	private $cache;
+
+	public function __construct(Data $data, Mime $mime, $cache)
 	{
 		$this->data = $data;
 		$this->mime = $mime;
+		$this->cache = $cache;
 	}
 
 	public function send(string $path)
 	{
-		$this->sendCacheControlHeader(true);
+		$this->addCacheControlHeader();
 
-		$eTag = $this->getServerETag($path);
-		$this->sendETagHeader($eTag);
-
-		$this->sendUnmodifiedHeader($eTag) ||
-		$this->sendFile($path);
-	}
-
-	private function sendCacheControlHeader(bool $immutable)
-	{
-		if ($immutable) {
-			header('Cache-Control: public, max-age=31536000, immutable');
-		}
-	}
-
-	private function getServerETag(string $path)
-	{
-		$mtime = $this->data->mtime($path);
-
-		if ($mtime === null) {
-			throw new Exception('Unable to read the file modification time.');
-		}
-
-		return base_convert($mtime, 10, 36);
-	}
-
-	private function sendETagHeader(string $eTag)
-	{
-		header("ETag: \"{$eTag}\"");
-	}
-
-	private function sendUnmodifiedHeader(string $serverETag)
-	{
-		$method = $_SERVER['REQUEST_METHOD'];
 		$clientETag = $this->getClientETag();
+		$serverETag = $this->newServerETag($path);
 
-		if (
-			(($method === 'GET') || ($method === 'HEAD')) &&
-			($clientETag === $serverETag)
-		) {
-			header('HTTP/1.1 304 Not Modified');
-			return true;
-		}
+		$this->addETagHeader($serverETag);
 
-		return false;
+		$this->sendUnmodifiedHeader($clientETag, $serverETag) ||
+		$this->sendFile($path);
 	}
 
 	private function getClientETag()
@@ -102,14 +69,61 @@ class File
 		}
 
 		$eTag = trim($eTag, '"');
-
 		$i = strpos($eTag, '-');
 
-		if ($i === false) {
-			return $eTag;
+		if ($i !== false) {
+			$eTag = substr($eTag, 0, $i);
 		}
 
-		return substr($eTag, 0, $i);
+		return $eTag;
+	}
+
+	private function newServerETag(string $path)
+	{
+		$mtime = $this->data->mtime($path);
+
+		if ($mtime === null) {
+			throw new Exception('Unable to read the file modification time.');
+		}
+
+		return base_convert($mtime, 10, 36);
+	}
+
+	private function addETagHeader(string $eTag)
+	{
+		header("ETag: \"{$eTag}\"");
+	}
+
+	private function addCacheControlHeader()
+	{
+		if ($this->cache === null) {
+			return;
+		}
+
+		if ($this->cache) {
+			$directives = 'public, max-age=31536000, immutable';
+		} else {
+			$directives = 'no-store, max-age=0';
+		}
+
+		header("Cache-Control: {$directives}");
+	}
+
+	private function sendUnmodifiedHeader($clientETag, string $serverETag)
+	{
+		if ($clientETag !== $serverETag) {
+			return false;
+		}
+
+		$method = $_SERVER['REQUEST_METHOD'];
+
+		if (!(($method === 'GET') || ($method === 'HEAD'))) {
+			return false;
+		}
+
+
+		header('HTTP/1.1 304 Not Modified');
+		return true;
 	}
 
 	private function sendFile(string $path)
