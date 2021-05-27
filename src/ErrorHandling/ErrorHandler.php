@@ -29,8 +29,8 @@ class ErrorHandler implements ErrorHandlerInterface
 
 	public function handleThrowable(Throwable $throwable)
 	{
-		$this->showThrowable($throwable);
 		$this->logThrowable($throwable);
+		$this->showThrowable($throwable);
 	}
 
 	private function showThrowable(Throwable $throwable)
