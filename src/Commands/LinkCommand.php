@@ -57,21 +57,28 @@ class LinkCommand implements Command
 	public function run(Arguments $arguments)
 	{
 		$path = $arguments->getString(0);
-
-		$title = $this->getTitle("{$path}.page/.title/");
+		$title = $this->getTitle($path);
 
 		return $this->getAHtml($path, $title);
 	}
 
 	private function getTitle(string $path): string
 	{
-		$text = $this->data->read($path);
+		$this->getPathText("{$path}.page/.title/", $text)
+		|| $this->getPathText("{$path}.title/", $text);
 
 		if ($text === null) {
 			return '';
 		}
 
 		return $this->interpreter->interpret($text);
+	}
+
+	private function getPathText(string $key, &$text): bool
+	{
+		$text = $this->data->read($key);
+
+		return ($text !== null);
 	}
 
 	private function getAHtml(string $path, string $text): string
