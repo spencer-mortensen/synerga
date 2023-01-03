@@ -5,7 +5,7 @@ namespace Synerga\ErrorHandling;
 use ErrorException;
 use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
-use SpencerMortensen\Exceptions\ErrorHandlerInterface;
+use SpencerMortensen\Exceptions\Handler;
 use Synerga\ErrorHandling\Exceptions\EvaluationException;
 use Synerga\ErrorHandling\Exceptions\FileException;
 use Synerga\ErrorHandling\Exceptions\ParserException;
@@ -14,7 +14,7 @@ use Synerga\ErrorHandling\Pages\CodePage;
 use Synerga\Html;
 use Throwable;
 
-class ErrorHandler implements ErrorHandlerInterface
+class ErrorHandler implements Handler
 {
 	private $logger;
 	private $display;
@@ -27,7 +27,7 @@ class ErrorHandler implements ErrorHandlerInterface
 		$this->html = $html;
 	}
 
-	public function handleThrowable(Throwable $throwable)
+	public function handle(Throwable $throwable)
 	{
 		$this->logThrowable($throwable);
 		$this->showThrowable($throwable);
